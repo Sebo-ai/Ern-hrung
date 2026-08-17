@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Sebastian – Ernährungsplan</title>
+<style>
+/* ━━━ RESET & BASE ━━━ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:        #0a0a0f;
+  --bg2:       #13131a;
+  --bg3:       #1c1c26;
+  --border:    rgba(255,255,255,.08);
+  --text:      #f0f0f5;
+  --text2:     #8e8ea0;
+  --text3:     #5c5c70;
+  --accent:    #4f8ef7;
+  --green:     #30d986;
+  --orange:    #ff9f3a;
+  --red:       #ff5f5f;
+  --purple:    #bf5af2;
+  --radius:    16px;
+  --safe-b:    env(safe-area-inset-bottom, 0px);
+}
+html { -webkit-text-size-adjust: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+* { -webkit-tap-highlight-color: transparent; }
+button { font-family: inherit; cursor: pointer; }
+
+/* ━━━ LAYOUT ━━━ */
+#app {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  position: relative;
+}
+
+/* ━━━ HEADER ━━━ */
+.app-header {
+  padding: 56px 20px 16px;
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid var(--border);
+}
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.header-greeting {
+  font-size: 13px;
+  color: var(--text2);
+  font-weight: 500;
+}
+.header-name {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+.header-badge {
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+}
+
+/* Macro pills in header */
+.macro-strip {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.macro-pill {
+  flex: 1;
+  background: var(--bg3);
+  border-radius: 10px;
+  padding: 8px 6px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+.macro-pill-val {
+  font-size: 16px;
+  font-weight: 800;
+  display: block;
+}
+.macro-pill-val.kcal { color: var(--accent); }
+.macro-pill-val.prot { color: var(--green); }
+.macro-pill-val.carb { color: var(--orange); }
+.macro-pill-val.fat  { color: var(--red); }
+.macro-pill-label {
+  font-size: 10px;
+  color: var(--text3);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-top: 1px;
+}
+
+/* ━━━ PAGES ━━━ */
+.page { display: none; padding: 16px 16px 100px; }
+.page.active { display: block; }
+
+/* ━━━ SECTION HEADER ━━━ */
+.section-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin: 20px 0 10px;
+}
+.section-label:first-child { margin-top: 0; }
+
+/* ━━━ DAY CARD (Heute) ━━━ */
+.today-day {
+  background: var(--bg3);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.today-day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.today-day-name {
+  font-size: 17px;
+  font-weight: 700;
+}
+.today-training-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  background: rgba(79, 142, 247, .12);
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+/* Meal row in today view */
+.meal-row {
+  display: flex;
+  align-items: center;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+  cursor: pointer;
+  transition: background .15s;
+  -webkit-tap-highlight-color: transparent;
+  active:background: var(--bg2);
+}
+.meal-row:last-child { border-bottom: none; }
+.meal-row:active { background: rgba(255,255,255,.04); }
+.meal-row-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.meal-row-icon.fruehstueck { background: rgba(255,159,58,.15); }
+.meal-row-icon.mittagessen { background: rgba(79,142,247,.15); }
+.meal-row-icon.snack       { background: rgba(48,217,134,.15); }
+.meal-row-icon.abendessen  { background: rgba(191,90,242,.15); }
+.meal-row-text { flex: 1; min-width: 0; }
+.meal-row-cat {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.meal-row-name {
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+.meal-row-kcal {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+/* Day total bar */
+.day-total-bar {
+  background: var(--bg2);
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0;
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+.day-total-bar .label { font-size: 12px; color: var(--text2); }
+.day-total-bar .total-val { font-size: 18px; font-weight: 800; color: var(--green); }
+
+/* ━━━ WEEK STRIP ━━━ */
+.week-strip {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+  margin-bottom: 16px;
+}
+.week-strip::-webkit-scrollbar { display: none; }
+.week-day-btn {
+  flex-shrink: 0;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .15s;
+  min-width: 56px;
+}
+.week-day-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.week-day-btn .wd-name {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text2);
+  display: block;
+}
+.week-day-btn.active .wd-name { color: #fff; }
+.week-day-btn .wd-kcal {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  display: block;
+  margin-top: 2px;
+}
+.week-day-btn.active .wd-kcal { color: rgba(255,255,255,.85); }
+
+/* ━━━ MAHLZEITEN KARTEN ━━━ */
+.meals-filter {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin-bottom: 14px;
+  padding-bottom: 4px;
+}
+.meals-filter::-webkit-scrollbar { display: none; }
+.filter-btn {
+  flex-shrink: 0;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text2);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  transition: all .15s;
+}
+.filter-btn.active {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--bg);
+}
+
+.meal-card {
+  background: var(--bg3);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin-bottom: 10px;
+  display: none;
+}
+.meal-card.visible { display: block; }
+.meal-card-head {
+  padding: 16px 16px 12px;
+}
+.meal-card-code {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+.meal-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 3px;
+}
+.meal-card-time {
+  font-size: 12px;
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.macros-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.macro-cell {
+  text-align: center;
+  padding: 10px 4px;
+  border-right: 1px solid var(--border);
+}
+.macro-cell:last-child { border-right: none; }
+.macro-cell-val {
+  font-size: 18px;
+  font-weight: 800;
+  display: block;
+}
+.macro-cell-val.kcal { color: var(--accent); }
+.macro-cell-val.prot { color: var(--green); }
+.macro-cell-val.carb { color: var(--orange); }
+.macro-cell-val.fat  { color: var(--red); }
+.macro-cell-label {
+  font-size: 10px;
+  color: var(--text3);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.ingredients-list {
+  padding: 10px 16px 4px;
+}
+.ing-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.ing-row:last-child { border-bottom: none; }
+.ing-name { color: var(--text); }
+.ing-detail { color: var(--text2); font-size: 12px; font-weight: 500; }
+.meal-tip {
+  margin: 4px 16px 14px;
+  background: rgba(79,142,247,.1);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 10px 10px 0;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.5;
+}
+
+/* ━━━ EINKAUF ━━━ */
+.shop-section {
+  background: var(--bg3);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.shop-section-header {
+  padding: 12px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.shop-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+  cursor: pointer;
+  transition: background .12s;
+}
+.shop-item:last-child { border-bottom: none; }
+.shop-item:active { background: rgba(255,255,255,.03); }
+.shop-cb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--text3);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .15s;
+}
+.shop-cb.checked {
+  background: var(--green);
+  border-color: var(--green);
+}
+.shop-cb.checked::after {
+  content: '';
+  width: 6px;
+  height: 10px;
+  border: 2px solid #fff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg) translateY(-1px);
+  display: block;
+}
+.shop-name {
+  flex: 1;
+  font-size: 15px;
+  transition: color .15s;
+}
+.shop-item.done .shop-name {
+  color: var(--text3);
+  text-decoration: line-through;
+}
+.shop-qty {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+}
+.shop-item.done .shop-qty { color: var(--text3); }
+
+.shop-progress-bar {
+  background: var(--bg2);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+.progress-track {
+  flex: 1;
+  height: 6px;
+  background: var(--bg);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--green);
+  border-radius: 3px;
+  transition: width .3s ease;
+}
+.progress-text {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green);
+  white-space: nowrap;
+}
+
+/* ━━━ EXTRAS/SUPPLEMENTS ━━━ */
+.extra-card {
+  background: var(--bg3);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 16px;
+  margin-bottom: 10px;
+}
+.extra-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.extra-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.extra-name { font-size: 16px; font-weight: 700; }
+.extra-sub { font-size: 12px; color: var(--text2); margin-top: 1px; }
+.extra-body { font-size: 14px; color: var(--text2); line-height: 1.6; }
+.extra-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-top: 10px;
+}
+.extra-tag.go    { background: rgba(48,217,134,.15); color: var(--green); }
+.extra-tag.stop  { background: rgba(255,95,95,.15);  color: var(--red); }
+.extra-tag.maybe { background: rgba(255,159,58,.15); color: var(--orange); }
+
+.batch-card {
+  background: var(--bg3);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 16px;
+  margin-bottom: 10px;
+}
+.batch-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.batch-step {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+.batch-step:last-child { margin-bottom: 0; }
+.batch-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.batch-text { font-size: 14px; color: var(--text2); line-height: 1.5; }
+.batch-text strong { color: var(--text); }
+
+/* ━━━ BOTTOM NAV ━━━ */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  background: rgba(13, 13, 20, 0.92);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  padding: 10px 0 calc(10px + var(--safe-b));
+  z-index: 100;
+}
+.nav-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 0;
+  color: var(--text3);
+  transition: color .15s;
+}
+.nav-btn.active { color: var(--accent); }
+.nav-btn svg {
+  width: 24px;
+  height: 24px;
+}
+.nav-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+/* ━━━ DETAIL MODAL ━━━ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  z-index: 200;
+  display: none;
+  align-items: flex-end;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; }
+.modal-sheet {
+  background: var(--bg2);
+  border-radius: 24px 24px 0 0;
+  width: 100%;
+  max-height: 90dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  animation: slideUp .3s ease;
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+.modal-handle {
+  width: 40px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 12px auto 0;
+}
+.modal-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: var(--bg3);
+  border: none;
+  color: var(--text2);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-inner { padding: 16px 16px calc(32px + var(--safe-b)); }
+.modal-tag {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+.modal-title {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 4px;
+  letter-spacing: -0.3px;
+}
+.modal-subtitle {
+  font-size: 14px;
+  color: var(--text2);
+  margin-bottom: 16px;
+}
+
+/* ━━━ EMPTY / HINT ━━━ */
+.hint-box {
+  background: var(--bg3);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 20px;
+  text-align: center;
+  margin: 16px 0;
+}
+.hint-box p { color: var(--text2); font-size: 14px; line-height: 1.6; }
+
+/* iPad optimization */
+@media (min-width: 600px) {
+  #app { max-width: 600px; }
+  .bottom-nav { max-width: 600px; }
+  .modal-overlay .modal-sheet { max-width: 600px; margin: 0 auto; border-radius: 24px; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <div class="app-header" id="mainHeader">
+    <div class="header-top">
+      <div>
+        <div class="header-greeting" id="headerGreeting">Guten Morgen,</div>
+        <div class="header-name">Sebastian 💪</div>
+      </div>
+      <div class="header-badge">Lean Bulk</div>
+    </div>
+    <div class="macro-strip" id="macroStrip">
+      <div class="macro-pill">
+        <span class="macro-pill-val kcal" id="stripKcal">3.284</span>
+        <span class="macro-pill-label">kcal</span>
+      </div>
+      <div class="macro-pill">
+        <span class="macro-pill-val prot" id="stripProt">165g</span>
+        <span class="macro-pill-label">Protein</span>
+      </div>
+      <div class="macro-pill">
+        <span class="macro-pill-val carb" id="stripCarb">440g</span>
+        <span class="macro-pill-label">Carbs</span>
+      </div>
+      <div class="macro-pill">
+        <span class="macro-pill-val fat" id="stripFat">90g</span>
+        <span class="macro-pill-label">Fett</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: HEUTE -->
+  <div class="page active" id="pageHeute">
+    <div style="margin-bottom: 14px;">
+      <div class="week-strip" id="weekStrip"></div>
+    </div>
+
+    <div id="todayContent"></div>
+
+    <div class="hint-box" style="margin-top:8px;">
+      <p>💡 Tippe auf eine Mahlzeit für das volle Rezept mit Zutaten und Tipps.</p>
+    </div>
+  </div>
+
+  <!-- PAGE: WOCHE -->
+  <div class="page" id="pageWoche">
+    <p class="section-label">Wochenübersicht</p>
+    <div id="weekOverview"></div>
+  </div>
+
+  <!-- PAGE: MAHLZEITEN -->
+  <div class="page" id="pageMahlzeiten">
+    <div class="meals-filter" id="mealsFilter">
+      <button class="filter-btn active" onclick="filterMeals('all', this)">Alle</button>
+      <button class="filter-btn" onclick="filterMeals('fruehstueck', this)">🌅 Frühstück</button>
+      <button class="filter-btn" onclick="filterMeals('mittagessen', this)">🍚 Mittag</button>
+      <button class="filter-btn" onclick="filterMeals('snack', this)">⚡ Snack</button>
+      <button class="filter-btn" onclick="filterMeals('abendessen', this)">🌙 Abend</button>
+    </div>
+    <div id="mealsContainer"></div>
+  </div>
+
+  <!-- PAGE: EINKAUF -->
+  <div class="page" id="pageEinkauf">
+    <div class="shop-progress-bar">
+      <div class="progress-track">
+        <div class="progress-fill" id="shopProgress" style="width:0%"></div>
+      </div>
+      <div class="progress-text" id="shopProgressText">0 / 31</div>
+    </div>
+    <div id="shopContainer"></div>
+  </div>
+
+  <!-- PAGE: EXTRAS -->
+  <div class="page" id="pageExtras">
+    <p class="section-label">Supplements</p>
+    <div id="supplementsContainer"></div>
+    <p class="section-label">Batch Cooking</p>
+    <div id="batchContainer"></div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="showPage('pageHeute', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      <span class="nav-label">Heute</span>
+    </button>
+    <button class="nav-btn" onclick="showPage('pageWoche', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>
+      </svg>
+      <span class="nav-label">Woche</span>
+    </button>
+    <button class="nav-btn" onclick="showPage('pageMahlzeiten', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 2l18 10-18 10V2z"/>
+      </svg>
+      <span class="nav-label">Rezepte</span>
+    </button>
+    <button class="nav-btn" onclick="showPage('pageEinkauf', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
+      </svg>
+      <span class="nav-label">Einkauf</span>
+    </button>
+    <button class="nav-btn" onclick="showPage('pageExtras', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2a5 5 0 015 5v3H7V7a5 5 0 015-5z"/><rect x="3" y="10" width="18" height="12" rx="2"/>
+      </svg>
+      <span class="nav-label">Extras</span>
+    </button>
+  </nav>
+
+</div>
+
+<!-- MODAL SHEET -->
+<div class="modal-overlay" id="mealModal" onclick="closeModal(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <button class="modal-close-btn" onclick="document.getElementById('mealModal').classList.remove('open')">✕</button>
+    <div class="modal-inner" id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+// ━━━ DATA ━━━
+const MEALS = {
+  F1: {
+    code: 'F1', cat: 'fruehstueck', emoji: '🌅',
+    name: 'Overnight Oats mit Protein',
+    time: '5 min · Abends vorbereiten',
+    kcal: 939, prot: 64.6, carb: 114.2, fat: 26.7,
+    tip: 'Abends alles mischen, in Kühlschrank stellen. Morgens Banane + Nüsse drauf.',
+    ingredients: [
+      { name: 'Haferflocken', amt: '100g', kcal: 379 },
+      { name: 'Skyr (Arla Natur)', amt: '150g', kcal: 98 },
+      { name: 'Whey Protein', amt: '30g', kcal: 112 },
+      { name: 'Milch 3,5%', amt: '200ml', kcal: 128 },
+      { name: 'Banane', amt: '120g', kcal: 107 },
+      { name: 'Mandeln', amt: '20g', kcal: 115 },
+    ]
+  },
+  F2: {
+    code: 'F2', cat: 'fruehstueck', emoji: '🌅',
+    name: 'Rührei mit Toast & Aufschnitt',
+    time: '10 min',
+    kcal: 951, prot: 65.5, carb: 61.6, fat: 48.6,
+    tip: '5 Eier scrambled (kein Öl nötig mit guter Antihaft-Pfanne). 4 Toast toasten, Frischkäse drauf.',
+    ingredients: [
+      { name: 'Eier (5 Stück)', amt: '300g', kcal: 450 },
+      { name: 'Vollkorntoast', amt: '4 Scheiben (140g)', kcal: 336 },
+      { name: 'Frischkäse (Philadelphia)', amt: '35g', kcal: 93 },
+      { name: 'Putenaufschnitt', amt: '70g', kcal: 72 },
+    ]
+  },
+  F3: {
+    code: 'F3', cat: 'fruehstueck', emoji: '🌅',
+    name: 'Protein Pancakes',
+    time: '15 min · Für gemütliche Morgen',
+    kcal: 891, prot: 80.5, carb: 79.5, fat: 28.9,
+    tip: 'Haferflocken fein mixen, mit Eiern + Whey verquirlen, in Antihaft-Pfanne ohne Öl ausbacken.',
+    ingredients: [
+      { name: 'Haferflocken (gemahlen)', amt: '100g', kcal: 379 },
+      { name: 'Eier (3 Stück)', amt: '180g', kcal: 270 },
+      { name: 'Whey Protein', amt: '30g', kcal: 112 },
+      { name: 'Skyr (Topping)', amt: '200g', kcal: 130 },
+    ]
+  },
+  F4: {
+    code: 'F4', cat: 'fruehstueck', emoji: '🌅',
+    name: 'Skyr Bowl',
+    time: '5 min · Einfach & sättigend',
+    kcal: 796, prot: 58.4, carb: 97.0, fat: 18.8,
+    tip: 'Skyr in Bowl, alles drauf, Schokolade grob hacken. Fertig.',
+    ingredients: [
+      { name: 'Skyr', amt: '450g', kcal: 293 },
+      { name: 'Apfel', amt: '150g', kcal: 78 },
+      { name: 'Banane', amt: '120g', kcal: 107 },
+      { name: 'Puffreis', amt: '25g', kcal: 90 },
+      { name: 'Mandeln', amt: '20g', kcal: 115 },
+      { name: 'Schokolade 85%', amt: '15g', kcal: 83 },
+      { name: 'Honig', amt: '10g', kcal: 30 },
+    ]
+  },
+  M1: {
+    code: 'M1', cat: 'mittagessen', emoji: '🍚',
+    name: 'Hähnchen-Reis Bowl',
+    time: '20 min · Batch Cooking empfohlen',
+    kcal: 856, prot: 69.9, carb: 116.8, fat: 11.1,
+    tip: '3–4 Portionen auf einmal kochen → 3 Tage haltbar. Hähnchen würzen, in Pfanne mit minimalem Öl anbraten.',
+    ingredients: [
+      { name: 'Hähnchenbrust', amt: '250g', kcal: 275 },
+      { name: 'Reis (roh)', amt: '140g', kcal: 491 },
+      { name: 'Gemüse (Brokkoli/Paprika)', amt: '150g', kcal: 45 },
+      { name: 'Olivenöl (Bratöl)', amt: '5g', kcal: 45 },
+    ]
+  },
+  M2: {
+    code: 'M2', cat: 'mittagessen', emoji: '🍚',
+    name: 'Rinderhack-Reisbowl',
+    time: '20 min',
+    kcal: 906, prot: 45.3, carb: 111.9, fat: 33.0,
+    tip: 'Hack krümelig anbraten — kein Öl nötig, das Hack bringt eigenes Fett mit. Paprika + Zwiebeln dazu.',
+    ingredients: [
+      { name: 'Rinderhack (~15% Fett)', amt: '180g', kcal: 360 },
+      { name: 'Reis (roh)', amt: '130g', kcal: 456 },
+      { name: 'Paprika / Zwiebeln', amt: '150g', kcal: 45 },
+      { name: 'Olivenöl (minimal)', amt: '5g', kcal: 45 },
+    ]
+  },
+  M3: {
+    code: 'M3', cat: 'mittagessen', emoji: '🍚',
+    name: 'Hähnchen Wrap',
+    time: '15 min',
+    kcal: 821, prot: 63.4, carb: 59.4, fat: 35.9,
+    tip: 'Fleisch würzen und anbraten. Wraps erwärmen. Gemüse + Käse rein, Creme fraîche als Sauce.',
+    ingredients: [
+      { name: 'Hähnchenbrust', amt: '180g', kcal: 198 },
+      { name: 'Tortilla Wraps', amt: '2 Stück (100g)', kcal: 321 },
+      { name: 'Streukäse Gouda', amt: '40g', kcal: 105 },
+      { name: 'Creme fraîche', amt: '50g', kcal: 173 },
+      { name: 'Gemüse (Paprika/Salat)', amt: '80g', kcal: 24 },
+    ]
+  },
+  S1: {
+    code: 'S1', cat: 'snack', emoji: '⚡',
+    name: 'Protein Shake + Banane',
+    time: '2 min',
+    kcal: 448, prot: 41.9, carb: 46.0, fat: 13.6,
+    tip: 'Ideal als Workout-Snack. Alternative ohne Pulver: 300g Skyr + Banane + 15g Mandeln (388 kcal, 37g P).',
+    ingredients: [
+      { name: 'Whey Protein', amt: '40g', kcal: 149 },
+      { name: 'Milch 3,5%', amt: '300ml', kcal: 192 },
+      { name: 'Banane', amt: '120g', kcal: 107 },
+    ]
+  },
+  S2: {
+    code: 'S2', cat: 'snack', emoji: '⚡',
+    name: 'Skyr Bowl mit Extras',
+    time: '5 min',
+    kcal: 521, prot: 37.0, carb: 61.9, fat: 12.9,
+    tip: 'Skyr in Bowl, Granola drauf, Apfel + Schokolade + Honig. Einfach und sättigend.',
+    ingredients: [
+      { name: 'Skyr', amt: '300g', kcal: 195 },
+      { name: 'Granola', amt: '30g', kcal: 135 },
+      { name: 'Apfel', amt: '150g', kcal: 78 },
+      { name: 'Schokolade 85%', amt: '15g', kcal: 83 },
+      { name: 'Honig', amt: '10g', kcal: 30 },
+    ]
+  },
+  A1: {
+    code: 'A1', cat: 'abendessen', emoji: '🌙',
+    name: 'Hähnchen mit Süßkartoffeln',
+    time: '25 min · Ofen + Pfanne',
+    kcal: 623, prot: 64.3, carb: 68.4, fat: 11.2,
+    tip: 'Süßkartoffeln würfeln, mit 5g Öl + Gewürzen bei 200°C 20 min in den Ofen. Hähnchen parallel in Pfanne.',
+    ingredients: [
+      { name: 'Hähnchenbrust', amt: '250g', kcal: 275 },
+      { name: 'Süßkartoffeln', amt: '300g', kcal: 258 },
+      { name: 'Gemüse', amt: '150g', kcal: 45 },
+      { name: 'Olivenöl (für Ofen)', amt: '5g', kcal: 45 },
+    ]
+  },
+  A2: {
+    code: 'A2', cat: 'abendessen', emoji: '🌙',
+    name: 'Rinderhack-Pfanne mit Kartoffeln',
+    time: '20 min',
+    kcal: 760, prot: 49.8, carb: 57.9, fat: 38.4,
+    tip: 'Kartoffeln würfeln, in Pfanne anbraten (5g Öl). Hack dazu — brät im eigenen Fett.',
+    ingredients: [
+      { name: 'Rinderhack (~15% Fett)', amt: '220g', kcal: 440 },
+      { name: 'Kartoffeln', amt: '350g', kcal: 245 },
+      { name: 'Gemüse / Zwiebel', amt: '100g', kcal: 30 },
+      { name: 'Olivenöl (minimal)', amt: '5g', kcal: 45 },
+    ]
+  },
+  A3: {
+    code: 'A3', cat: 'abendessen', emoji: '🌙',
+    name: 'Pasta mit Hähnchen & Mozzarella',
+    time: '20 min',
+    kcal: 1041, prot: 76.2, carb: 119.9, fat: 26.9,
+    tip: 'Pasta kochen. Hähnchen anbraten, Passata dazu, aufkochen. Pasta dazu, Mozzarella drüber schmelzen.',
+    ingredients: [
+      { name: 'Pasta (Penne/Rigatoni)', amt: '150g roh', kcal: 525 },
+      { name: 'Hähnchenbrust', amt: '180g', kcal: 198 },
+      { name: 'Passata', amt: '200g', kcal: 70 },
+      { name: 'Mozzarella', amt: '80g', kcal: 203 },
+      { name: 'Olivenöl (minimal)', amt: '5g', kcal: 45 },
+    ]
+  },
+};
+
+const WEEK = [
+  { day: 'Mo', training: 'Lower', F: 'F1', M: 'M1', S: 'S1', A: 'A3', kcal: 3284 },
+  { day: 'Di', training: 'Push + Zone 2', F: 'F2', M: 'M2', S: 'S1', A: 'A2', kcal: 3065 },
+  { day: 'Mi', training: 'Pull', F: 'F4', M: 'M1', S: 'S1', A: 'A3', kcal: 3141 },
+  { day: 'Do', training: 'Lower', F: 'F1', M: 'M3', S: 'S1', A: 'A3', kcal: 3249 },
+  { day: 'Fr', training: 'Zone 2', F: 'F2', M: 'M2', S: 'S2', A: 'A1', kcal: 3001 },
+  { day: 'Sa', training: 'Upper', F: 'F1', M: 'M1', S: 'S1', A: 'A3', kcal: 3284 },
+  { day: 'So', training: 'Intervalle', F: 'F4', M: 'M3', S: 'S2', A: 'A2', kcal: 2898 },
+];
+
+const SHOPPING = [
+  {
+    cat: '🥩 Protein',
+    icon: '🥩',
+    items: [
+      { name: 'Hähnchenbrust', qty: '1,4 kg' },
+      { name: 'Rinderhack (~15% Fett)', qty: '800g' },
+      { name: 'Eier', qty: '25 Stück' },
+      { name: 'Skyr', qty: '1,8 kg' },
+      { name: 'Putenaufschnitt', qty: '150g' },
+      { name: 'Frischkäse (Philadelphia)', qty: '150g' },
+      { name: 'Mozzarella', qty: '320g' },
+      { name: 'Streukäse Gouda (gerieben)', qty: '160g' },
+      { name: 'Whey Protein', qty: '~200g (optional)' },
+    ]
+  },
+  {
+    cat: '🍚 Kohlenhydrate',
+    icon: '🍚',
+    items: [
+      { name: 'Haferflocken', qty: '400g' },
+      { name: 'Reis (roh)', qty: '700g' },
+      { name: 'Pasta (Penne/Rigatoni)', qty: '600g' },
+      { name: 'Kartoffeln', qty: '1,5 kg' },
+      { name: 'Süßkartoffeln', qty: '600g' },
+      { name: 'Tortilla Wraps', qty: '1 Packung (6 Stück)' },
+      { name: 'Vollkorntoast', qty: '1 Packung' },
+      { name: 'Bananen', qty: '10 Stück' },
+      { name: 'Äpfel', qty: '6 Stück' },
+      { name: 'Puffreis', qty: '1 Packung' },
+      { name: 'Granola', qty: '200g' },
+    ]
+  },
+  {
+    cat: '🫙 Fette & Extras',
+    icon: '🫙',
+    items: [
+      { name: 'Olivenöl', qty: '1 Flasche' },
+      { name: 'Mandeln', qty: '200g' },
+      { name: 'Milch 3,5%', qty: '2 Liter' },
+      { name: 'Passata', qty: '400g' },
+      { name: 'Creme fraîche', qty: '200g' },
+      { name: 'Schokolade 85%', qty: '1–2 Tafeln' },
+      { name: 'Honig', qty: '1 Glas' },
+    ]
+  },
+  {
+    cat: '🥦 Gemüse',
+    icon: '🥦',
+    items: [
+      { name: 'Brokkoli', qty: 'je nach Saison' },
+      { name: 'Paprika', qty: 'je nach Saison' },
+      { name: 'Zwiebeln', qty: 'je nach Saison' },
+      { name: 'Knoblauch', qty: 'je nach Saison' },
+    ]
+  },
+];
+
+const SUPPLEMENTS = [
+  { name: 'Magnesium', sub: 'Schlaf & Regeneration', icon: '💊', bg: 'rgba(48,217,134,.1)', status: 'go', tag: '✓ Weiter nehmen', body: 'Wichtig für Schlaf, Nervenfunktion und Muskelregeneration. Täglich abends einnehmen.' },
+  { name: 'Omega-3', sub: 'Kein Fisch → Pflicht', icon: '🐟', bg: 'rgba(79,142,247,.1)', status: 'go', tag: '✓ Unbedingt weiter', body: 'Da du keinen Fisch isst, ist Omega-3 über Kapseln unverzichtbar. Deckt den Bedarf an EPA und DHA.' },
+  { name: 'Vitamin D3 + K2', sub: 'Essenziell im Studium', icon: '☀️', bg: 'rgba(255,159,58,.1)', status: 'go', tag: '✓ Weiter nehmen', body: 'Besonders in Deutschland und bei wenig Sonnenexposition im Alltag essenziell. D3 + K2 immer kombiniert.' },
+  { name: 'Kreatin HCl', sub: 'Statt Monohydrat testen', icon: '⚡', bg: 'rgba(191,90,242,.1)', status: 'maybe', tag: '→ HCl testen', body: 'Kreatin Monohydrat verursacht dir Kopfschmerzen durch Wassereinlagerung. Kreatin HCl ist besser löslich, 2–3g Dosis, deutlich weniger Nebenwirkungen. Täglich nach dem Training.' },
+  { name: 'Ashwagandha', sub: 'Momentan nicht nötig', icon: '🌿', bg: 'rgba(255,95,95,.1)', status: 'stop', tag: '× Absetzen ist fine', body: 'Evidenz für Cortisol & Schlaf ist da, aber kein direkter Muskelaufbau-Effekt. Wenn kein merklicher Unterschied — weglassen.' },
+];
+
+// ━━━ STATE ━━━
+let currentDay = new Date().getDay(); // 0=So, 1=Mo...
+// Adjust to our array (0=Mo...6=So)
+let todayIdx = currentDay === 0 ? 6 : currentDay - 1;
+let activeShop = {};
+
+// ━━━ INIT ━━━
+function init() {
+  setGreeting();
+  buildWeekStrip();
+  renderToday(todayIdx);
+  buildWeekOverview();
+  buildMealsPage();
+  buildShoppingPage();
+  buildExtrasPage();
+}
+
+function setGreeting() {
+  const h = new Date().getHours();
+  const el = document.getElementById('headerGreeting');
+  if (h < 11) el.textContent = 'Guten Morgen,';
+  else if (h < 17) el.textContent = 'Hey,';
+  else el.textContent = 'Guten Abend,';
+}
+
+// ━━━ WEEK STRIP ━━━
+function buildWeekStrip() {
+  const cont = document.getElementById('weekStrip');
+  cont.innerHTML = '';
+  WEEK.forEach((d, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'week-day-btn' + (i === todayIdx ? ' active' : '');
+    btn.innerHTML = `<span class="wd-name">${d.day}</span><span class="wd-kcal">${d.kcal.toLocaleString('de')} kcal</span>`;
+    btn.onclick = () => selectDay(i);
+    cont.appendChild(btn);
+  });
+}
+
+function selectDay(idx) {
+  todayIdx = idx;
+  document.querySelectorAll('.week-day-btn').forEach((b, i) => {
+    b.classList.toggle('active', i === idx);
+  });
+  renderToday(idx);
+}
+
+// ━━━ TODAY VIEW ━━━
+function renderToday(idx) {
+  const d = WEEK[idx];
+  const cont = document.getElementById('todayContent');
+
+  const catMap = {
+    F: { label: 'Frühstück', cls: 'fruehstueck', icon: '🌅' },
+    M: { label: 'Mittagessen', cls: 'mittagessen', icon: '🍚' },
+    S: { label: 'Snack', cls: 'snack', icon: '⚡' },
+    A: { label: 'Abendessen', cls: 'abendessen', icon: '🌙' },
+  };
+
+  let rows = '';
+  for (const [key, cat] of Object.entries(catMap)) {
+    const meal = MEALS[d[key]];
+    rows += `
+      <div class="meal-row" onclick="openMeal('${meal.code}')">
+        <div class="meal-row-icon ${cat.cls}">${cat.icon}</div>
+        <div class="meal-row-text">
+          <div class="meal-row-cat">${cat.label}</div>
+          <div class="meal-row-name">${meal.name}</div>
+        </div>
+        <div class="meal-row-kcal">${meal.kcal} kcal</div>
+      </div>`;
+  }
+
+  // Update header macros for this day
+  const dayMeals = [MEALS[d.F], MEALS[d.M], MEALS[d.S], MEALS[d.A]];
+  const totP = dayMeals.reduce((s, m) => s + m.prot, 0).toFixed(0);
+  const totC = dayMeals.reduce((s, m) => s + m.carb, 0).toFixed(0);
+  const totF = dayMeals.reduce((s, m) => s + m.fat, 0).toFixed(0);
+  document.getElementById('stripKcal').textContent = d.kcal.toLocaleString('de');
+  document.getElementById('stripProt').textContent = totP + 'g';
+  document.getElementById('stripCarb').textContent = totC + 'g';
+  document.getElementById('stripFat').textContent = totF + 'g';
+
+  cont.innerHTML = `
+    <div class="today-day">
+      <div class="today-day-header">
+        <div class="today-day-name">${d.day === WEEK[todayIdx].day && idx === (new Date().getDay() === 0 ? 6 : new Date().getDay() - 1) ? 'Heute · ' : ''}${['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'][idx]}</div>
+        <div class="today-training-badge">🏋️ ${d.training}</div>
+      </div>
+      ${rows}
+      <div class="day-total-bar">
+        <span class="label">Tagesgesamt</span>
+        <span class="total-val">${d.kcal.toLocaleString('de')} kcal</span>
+      </div>
+    </div>`;
+}
+
+// ━━━ WEEK OVERVIEW ━━━
+function buildWeekOverview() {
+  const cont = document.getElementById('weekOverview');
+  const dayNames = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'];
+  const avg = Math.round(WEEK.reduce((s, d) => s + d.kcal, 0) / 7);
+  let html = `
+    <div class="today-day" style="margin-bottom:10px;">
+      <div class="today-day-header">
+        <div class="today-day-name">Wochenschnitt</div>
+        <div class="today-training-badge">${avg.toLocaleString('de')} kcal / Tag</div>
+      </div>
+      <div style="padding: 14px 16px; display:flex; gap:16px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:120px;">
+          <div style="font-size:11px; color:var(--text3); font-weight:700; text-transform:uppercase; margin-bottom:4px;">Ziel</div>
+          <div style="font-size:20px; font-weight:800; color:var(--accent);">3.250 kcal</div>
+        </div>
+        <div style="flex:1; min-width:120px;">
+          <div style="font-size:11px; color:var(--text3); font-weight:700; text-transform:uppercase; margin-bottom:4px;">Lücke</div>
+          <div style="font-size:20px; font-weight:800; color:var(--orange);">~118 kcal/Tag</div>
+        </div>
+        <div style="flex:1; min-width:200px; padding-top:4px;">
+          <div style="font-size:12px; color:var(--text2); line-height:1.5;">Einfach zu schließen: +20g Mandeln bei F4 oder 20g mehr Reis bei M1 reichen.</div>
+        </div>
+      </div>
+    </div>`;
+
+  WEEK.forEach((d, i) => {
+    const dayMeals = [MEALS[d.F], MEALS[d.M], MEALS[d.S], MEALS[d.A]];
+    const labels = ['Frühstück','Mittag','Snack','Abend'];
+    const icons = ['🌅','🍚','⚡','🌙'];
+    const keys = ['F','M','S','A'];
+    let rows = '';
+    keys.forEach((k, ki) => {
+      const m = MEALS[d[k]];
+      rows += `<div class="meal-row" onclick="openMeal('${m.code}')">
+        <div class="meal-row-icon" style="background:var(--bg2); font-size:16px;">${icons[ki]}</div>
+        <div class="meal-row-text">
+          <div class="meal-row-cat">${labels[ki]}</div>
+          <div class="meal-row-name">${m.name}</div>
+        </div>
+        <div class="meal-row-kcal">${m.kcal}</div>
+      </div>`;
+    });
+
+    html += `
+      <div class="today-day" style="margin-bottom:8px;">
+        <div class="today-day-header">
+          <div class="today-day-name">${dayNames[i]}</div>
+          <div class="today-training-badge">🏋️ ${d.training}</div>
+        </div>
+        ${rows}
+        <div class="day-total-bar">
+          <span class="label">Tagesgesamt</span>
+          <span class="total-val">${d.kcal.toLocaleString('de')} kcal</span>
+        </div>
+      </div>`;
+  });
+
+  cont.innerHTML = html;
+}
+
+// ━━━ MAHLZEITEN PAGE ━━━
+function buildMealsPage() {
+  const cont = document.getElementById('mealsContainer');
+  let html = '';
+  Object.values(MEALS).forEach(m => {
+    const ings = m.ingredients.map(i =>
+      `<div class="ing-row"><span class="ing-name">${i.name}</span><span class="ing-detail">${i.amt} · ${i.kcal} kcal</span></div>`
+    ).join('');
+    html += `
+      <div class="meal-card visible" data-cat="${m.cat}" id="card-${m.code}">
+        <div class="meal-card-head">
+          <div class="meal-card-code">${m.code} · ${m.cat === 'fruehstueck' ? 'Frühstück' : m.cat === 'mittagessen' ? 'Mittagessen' : m.cat === 'snack' ? 'Snack' : 'Abendessen'}</div>
+          <div class="meal-card-title">${m.name}</div>
+          <div class="meal-card-time">⏱ ${m.time}</div>
+        </div>
+        <div class="macros-row">
+          <div class="macro-cell"><span class="macro-cell-val kcal">${m.kcal}</span><span class="macro-cell-label">kcal</span></div>
+          <div class="macro-cell"><span class="macro-cell-val prot">${m.prot}g</span><span class="macro-cell-label">Protein</span></div>
+          <div class="macro-cell"><span class="macro-cell-val carb">${m.carb}g</span><span class="macro-cell-label">Carbs</span></div>
+          <div class="macro-cell"><span class="macro-cell-val fat">${m.fat}g</span><span class="macro-cell-label">Fett</span></div>
+        </div>
+        <div class="ingredients-list">${ings}</div>
+        ${m.tip ? `<div class="meal-tip">💡 ${m.tip}</div>` : ''}
+      </div>`;
+  });
+  cont.innerHTML = html;
+}
+
+function filterMeals(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.meal-card').forEach(card => {
+    if (cat === 'all' || card.dataset.cat === cat) {
+      card.classList.add('visible');
+    } else {
+      card.classList.remove('visible');
+    }
+  });
+}
+
+// ━━━ SHOPPING PAGE ━━━
+let shopState = {};
+
+function buildShoppingPage() {
+  const cont = document.getElementById('shopContainer');
+  let html = '';
+  let totalItems = 0;
+  SHOPPING.forEach((section, si) => {
+    let items = '';
+    section.items.forEach((item, ii) => {
+      const key = `${si}-${ii}`;
+      totalItems++;
+      items += `
+        <div class="shop-item" id="shopItem-${key}" onclick="toggleShop('${key}', ${si}, ${ii})">
+          <div class="shop-cb" id="shopCb-${key}"></div>
+          <span class="shop-name">${item.name}</span>
+          <span class="shop-qty">${item.qty}</span>
+        </div>`;
+    });
+    html += `
+      <div class="shop-section" style="margin-bottom:10px;">
+        <div class="shop-section-header">${section.cat}</div>
+        ${items}
+      </div>`;
+  });
+  cont.innerHTML = html;
+  window._shopTotal = totalItems;
+  updateShopProgress();
+}
+
+function toggleShop(key, si, ii) {
+  shopState[key] = !shopState[key];
+  const item = document.getElementById('shopItem-' + key);
+  const cb = document.getElementById('shopCb-' + key);
+  if (shopState[key]) {
+    item.classList.add('done');
+    cb.classList.add('checked');
+  } else {
+    item.classList.remove('done');
+    cb.classList.remove('checked');
+  }
+  updateShopProgress();
+}
+
+function updateShopProgress() {
+  const checked = Object.values(shopState).filter(Boolean).length;
+  const total = window._shopTotal || 31;
+  const pct = Math.round((checked / total) * 100);
+  document.getElementById('shopProgress').style.width = pct + '%';
+  document.getElementById('shopProgressText').textContent = `${checked} / ${total}`;
+}
+
+// ━━━ EXTRAS PAGE ━━━
+function buildExtrasPage() {
+  const cont = document.getElementById('supplementsContainer');
+  let html = '';
+  SUPPLEMENTS.forEach(s => {
+    const tagClass = s.status === 'go' ? 'go' : s.status === 'stop' ? 'stop' : 'maybe';
+    html += `
+      <div class="extra-card">
+        <div class="extra-header">
+          <div class="extra-icon" style="background:${s.bg}">${s.icon}</div>
+          <div><div class="extra-name">${s.name}</div><div class="extra-sub">${s.sub}</div></div>
+        </div>
+        <div class="extra-body">${s.body}</div>
+        <span class="extra-tag ${tagClass}">${s.tag}</span>
+      </div>`;
+  });
+  cont.innerHTML = html;
+
+  const batch = document.getElementById('batchContainer');
+  batch.innerHTML = `
+    <div class="batch-card">
+      <div class="batch-title">🍳 1× pro Woche (~40 min) <span style="font-size:12px;font-weight:500;color:var(--text2);">z.B. Sonntag</span></div>
+      <div class="batch-step">
+        <div class="batch-num">1</div>
+        <div class="batch-text"><strong>600g Hähnchenbrust</strong> auf einmal braten → reicht für Mo, Mi, Sa Mittag (M1)</div>
+      </div>
+      <div class="batch-step">
+        <div class="batch-num">2</div>
+        <div class="batch-text"><strong>400g Reis</strong> auf einmal kochen → 3–4 Tage haltbar im Kühlschrank</div>
+      </div>
+      <div class="batch-step">
+        <div class="batch-num">3</div>
+        <div class="batch-text"><strong>Overnight Oats</strong> abends in 5 min vorbereiten — morgens fertig</div>
+      </div>
+      <div class="batch-step">
+        <div class="batch-num">4</div>
+        <div class="batch-text"><strong>Rinderhack-Tipp:</strong> Doppelte Menge kochen (360g Hack, 260g Reis) → Di + Fr Mittag fertig</div>
+      </div>
+    </div>`;
+}
+
+// ━━━ MEAL MODAL ━━━
+function openMeal(code) {
+  const m = MEALS[code];
+  if (!m) return;
+  const ings = m.ingredients.map(i =>
+    `<div class="ing-row"><span class="ing-name">${i.name}</span><span class="ing-detail">${i.amt} · ${i.kcal} kcal</span></div>`
+  ).join('');
+  document.getElementById('modalContent').innerHTML = `
+    <div class="modal-tag">${m.cat === 'fruehstueck' ? '🌅 Frühstück' : m.cat === 'mittagessen' ? '🍚 Mittagessen' : m.cat === 'snack' ? '⚡ Snack' : '🌙 Abendessen'} · ${m.code}</div>
+    <div class="modal-title">${m.name}</div>
+    <div class="modal-subtitle">⏱ ${m.time}</div>
+    <div class="macros-row" style="border-radius:12px; overflow:hidden; margin-bottom:16px;">
+      <div class="macro-cell"><span class="macro-cell-val kcal">${m.kcal}</span><span class="macro-cell-label">kcal</span></div>
+      <div class="macro-cell"><span class="macro-cell-val prot">${m.prot}g</span><span class="macro-cell-label">Protein</span></div>
+      <div class="macro-cell"><span class="macro-cell-val carb">${m.carb}g</span><span class="macro-cell-label">Carbs</span></div>
+      <div class="macro-cell"><span class="macro-cell-val fat">${m.fat}g</span><span class="macro-cell-label">Fett</span></div>
+    </div>
+    <div style="font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;">Zutaten</div>
+    <div class="ingredients-list" style="background:var(--bg3);border-radius:12px;overflow:hidden;margin-bottom:14px;">${ings}</div>
+    ${m.tip ? `<div class="meal-tip">💡 ${m.tip}</div>` : ''}`;
+  document.getElementById('mealModal').classList.add('open');
+  document.getElementById('mealModal').querySelector('.modal-sheet').scrollTop = 0;
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('mealModal')) {
+    document.getElementById('mealModal').classList.remove('open');
+  }
+}
+
+// ━━━ NAVIGATION ━━━
+function showPage(pageId, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ━━━ START ━━━
+init();
+</script>
+</body>
+</html>
