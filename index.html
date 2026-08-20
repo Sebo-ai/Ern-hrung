@@ -5,1386 +5,1227 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Sebastian – Ernährungsplan</title>
+<title>Lean Bulk – Ernährungsplan</title>
 <style>
-/* ━━━ RESET & BASE ━━━ */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --bg:        #0a0a0f;
-  --bg2:       #13131a;
-  --bg3:       #1c1c26;
-  --border:    rgba(255,255,255,.08);
-  --text:      #f0f0f5;
-  --text2:     #8e8ea0;
-  --text3:     #5c5c70;
-  --accent:    #4f8ef7;
-  --green:     #30d986;
-  --orange:    #ff9f3a;
-  --red:       #ff5f5f;
-  --purple:    #bf5af2;
-  --radius:    16px;
-  --safe-b:    env(safe-area-inset-bottom, 0px);
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0d0d;
+  --bg2:#141414;
+  --bg3:#1e1e1e;
+  --border:rgba(255,255,255,.09);
+  --text:#f2f2f2;
+  --text2:#a0a0a0;
+  --text3:#555555;
+  --accent:#ffffff;
+  --radius:14px;
+  --safe-b:env(safe-area-inset-bottom,0px);
 }
-html { -webkit-text-size-adjust: 100%; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100dvh;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100dvh;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
 }
-* { -webkit-tap-highlight-color: transparent; }
-button { font-family: inherit; cursor: pointer; }
+*{-webkit-tap-highlight-color:transparent}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
 
-/* ━━━ LAYOUT ━━━ */
-#app {
-  max-width: 480px;
-  margin: 0 auto;
-  min-height: 100dvh;
-  position: relative;
-}
+#app{max-width:480px;margin:0 auto;min-height:100dvh;position:relative}
 
-/* ━━━ HEADER ━━━ */
-.app-header {
-  padding: 56px 20px 16px;
-  background: var(--bg);
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  border-bottom: 1px solid var(--border);
+/* HEADER */
+.app-header{
+  padding:52px 18px 14px;
+  background:var(--bg2);
+  position:sticky;top:0;z-index:50;
+  border-bottom:1px solid var(--border);
 }
-.header-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 6px;
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.header-greeting{font-size:12px;color:var(--text3);font-weight:500;letter-spacing:.3px}
+.header-name{font-size:24px;font-weight:800;letter-spacing:-.5px}
+.header-badge{
+  background:var(--text);color:var(--bg);
+  font-size:10px;font-weight:800;
+  padding:4px 10px;border-radius:20px;letter-spacing:.5px;
 }
-.header-greeting {
-  font-size: 13px;
-  color: var(--text2);
-  font-weight: 500;
+.macro-strip{display:flex;gap:6px;margin-top:10px}
+.macro-pill{
+  flex:1;background:var(--bg3);border-radius:10px;
+  padding:7px 4px;text-align:center;border:1px solid var(--border);
 }
-.header-name {
-  font-size: 26px;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-}
-.header-badge {
-  background: linear-gradient(135deg, var(--accent), var(--purple));
-  color: #fff;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 5px 10px;
-  border-radius: 20px;
-  letter-spacing: 0.3px;
+.macro-pill-val{font-size:14px;font-weight:800;display:block;color:var(--text2)}
+.macro-pill-label{
+  font-size:9px;color:var(--text3);font-weight:600;
+  text-transform:uppercase;letter-spacing:.5px;display:block;margin-top:1px;
 }
 
-/* Macro pills in header */
-.macro-strip {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
+/* PAGES */
+.page{display:none;padding:14px 14px 96px}
+.page.active{display:block}
+
+.section-label{
+  font-size:11px;font-weight:700;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.8px;
+  margin:18px 0 8px;
 }
-.macro-pill {
-  flex: 1;
-  background: var(--bg3);
-  border-radius: 10px;
-  padding: 8px 6px;
-  text-align: center;
-  border: 1px solid var(--border);
+.section-label:first-child{margin-top:0}
+
+/* WEEK STRIP */
+.week-strip{display:flex;gap:6px;padding:2px 0;overflow-x:auto;scrollbar-width:none}
+.week-strip::-webkit-scrollbar{display:none}
+.week-dot{
+  flex-shrink:0;width:42px;height:54px;border-radius:12px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;cursor:pointer;transition:all .15s;
+  border:1.5px solid var(--border);background:var(--bg2);
 }
-.macro-pill-val {
-  font-size: 16px;
-  font-weight: 800;
-  display: block;
+.week-dot.active{background:var(--text);border-color:var(--text)}
+.week-dot-day{font-size:10px;font-weight:700;color:var(--text2)}
+.week-dot.active .week-dot-day{color:var(--bg)}
+.week-dot-kcal{font-size:9px;color:var(--text3)}
+.week-dot.active .week-dot-kcal{color:rgba(0,0,0,.5)}
+
+/* TODAY */
+.today-card{
+  background:var(--bg2);border-radius:var(--radius);
+  border:1px solid var(--border);overflow:hidden;margin-top:12px;
 }
-.macro-pill-val.kcal { color: var(--accent); }
-.macro-pill-val.prot { color: var(--green); }
-.macro-pill-val.carb { color: var(--orange); }
-.macro-pill-val.fat  { color: var(--red); }
-.macro-pill-label {
-  font-size: 10px;
-  color: var(--text3);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  display: block;
-  margin-top: 1px;
+.today-header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 14px;border-bottom:1px solid var(--border);
+}
+.today-day-name{font-size:16px;font-weight:700}
+.training-badge{
+  font-size:10px;font-weight:600;color:var(--text2);
+  background:var(--bg3);padding:3px 9px;border-radius:20px;
+  border:1px solid var(--border);
 }
 
-/* ━━━ PAGES ━━━ */
-.page { display: none; padding: 16px 16px 100px; }
-.page.active { display: block; }
+/* MEAL ROW (Heute + Woche) */
+.meal-row{
+  display:flex;align-items:center;
+  border-bottom:1px solid var(--border);
+  cursor:pointer;transition:background .1s;overflow:hidden;
+}
+.meal-row:last-child{border-bottom:none}
+.meal-row:active{background:var(--bg3)}
+.meal-row-thumb{
+  width:70px;height:70px;flex-shrink:0;
+  object-fit:cover;background:var(--bg3);
+  display:block;
+}
+.meal-row-thumb-fallback{
+  width:70px;height:70px;flex-shrink:0;
+  background:var(--bg3);display:flex;align-items:center;
+  justify-content:center;font-size:24px;
+}
+.meal-row-body{flex:1;min-width:0;padding:10px 12px}
+.meal-row-cat{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
+.meal-row-name{font-size:14px;font-weight:600;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meal-row-kcal{font-size:11px;color:var(--text3);margin-top:2px}
+.meal-row-arrow{font-size:16px;color:var(--text3);padding-right:12px;flex-shrink:0}
 
-/* ━━━ SECTION HEADER ━━━ */
-.section-label {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text3);
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  margin: 20px 0 10px;
+/* WEEK OVERVIEW */
+.week-overview-card{
+  background:var(--bg2);border-radius:var(--radius);
+  border:1px solid var(--border);overflow:hidden;margin-bottom:8px;
 }
-.section-label:first-child { margin-top: 0; }
+.week-ov-header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 14px;border-bottom:1px solid var(--border);
+}
+.week-ov-day{font-size:15px;font-weight:700}
+.week-ov-kcal{font-size:12px;color:var(--text3)}
+.week-ov-row{
+  display:flex;align-items:center;border-bottom:1px solid var(--border);
+  cursor:pointer;transition:background .1s;overflow:hidden;
+}
+.week-ov-row:last-child{border-bottom:none}
+.week-ov-row:active{background:var(--bg3)}
+.week-ov-thumb{
+  width:52px;height:52px;flex-shrink:0;
+  object-fit:cover;background:var(--bg3);display:block;
+}
+.week-ov-body{flex:1;min-width:0;padding:8px 12px;display:flex;align-items:center;gap:8px}
+.week-ov-cat{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;min-width:36px}
+.week-ov-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+.week-ov-kcal2{font-size:11px;color:var(--text3);white-space:nowrap}
 
-/* ━━━ DAY CARD (Heute) ━━━ */
-.today-day {
-  background: var(--bg3);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  overflow: hidden;
-  margin-bottom: 8px;
+/* MEALS PAGE */
+.meals-filter{
+  display:flex;gap:6px;margin-bottom:12px;
+  overflow-x:auto;padding:2px 0;scrollbar-width:none;
 }
-.today-day-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--border);
+.meals-filter::-webkit-scrollbar{display:none}
+.filter-btn{
+  flex-shrink:0;padding:6px 14px;border-radius:20px;
+  font-size:12px;font-weight:600;
+  border:1.5px solid var(--border);color:var(--text2);
+  background:var(--bg2);transition:all .15s;white-space:nowrap;
 }
-.today-day-name {
-  font-size: 17px;
-  font-weight: 700;
-}
-.today-training-badge {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--accent);
-  background: rgba(79, 142, 247, .12);
-  padding: 4px 10px;
-  border-radius: 20px;
-}
+.filter-btn.active{background:var(--text);border-color:var(--text);color:var(--bg)}
 
-/* Meal row in today view */
-.meal-row {
-  display: flex;
-  align-items: center;
-  padding: 13px 16px;
-  border-bottom: 1px solid var(--border);
-  gap: 12px;
-  cursor: pointer;
-  transition: background .15s;
-  -webkit-tap-highlight-color: transparent;
-  active:background: var(--bg2);
+.meal-card{
+  background:var(--bg2);border-radius:var(--radius);
+  border:1px solid var(--border);margin-bottom:8px;
+  cursor:pointer;overflow:hidden;transition:transform .1s;
 }
-.meal-row:last-child { border-bottom: none; }
-.meal-row:active { background: rgba(255,255,255,.04); }
-.meal-row-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  flex-shrink: 0;
+.meal-card:active{transform:scale(.99)}
+.meal-card-top{display:flex;align-items:stretch;min-height:80px}
+.meal-card-img{
+  width:90px;flex-shrink:0;
+  object-fit:cover;display:block;background:var(--bg3);
 }
-.meal-row-icon.fruehstueck { background: rgba(255,159,58,.15); }
-.meal-row-icon.mittagessen { background: rgba(79,142,247,.15); }
-.meal-row-icon.snack       { background: rgba(48,217,134,.15); }
-.meal-row-icon.abendessen  { background: rgba(191,90,242,.15); }
-.meal-row-text { flex: 1; min-width: 0; }
-.meal-row-cat {
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--text3);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.meal-card-body{flex:1;min-width:0;padding:12px}
+.meal-card-cat{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
+.meal-card-name{font-size:14px;font-weight:700;margin-top:2px;letter-spacing:-.2px}
+.meal-card-time{font-size:11px;color:var(--text3);margin-top:3px}
+.meal-card-macros{
+  display:flex;gap:0;border-top:1px solid var(--border);
 }
-.meal-row-name {
-  font-size: 15px;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-top: 1px;
+.meal-macro{
+  flex:1;padding:7px 4px;text-align:center;
+  border-right:1px solid var(--border);
 }
-.meal-row-kcal {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--accent);
-  flex-shrink: 0;
-}
+.meal-macro:last-child{border-right:none}
+.meal-macro-val{font-size:12px;font-weight:700;color:var(--text2);display:block}
+.meal-macro-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;display:block}
 
-/* Day total bar */
-.day-total-bar {
-  background: var(--bg2);
-  padding: 12px 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 0;
-  border-top: 1px solid var(--border);
-  border-radius: 0 0 var(--radius) var(--radius);
+/* SHOPPING */
+.shop-progress-wrap{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:12px 14px;margin-bottom:12px;
 }
-.day-total-bar .label { font-size: 12px; color: var(--text2); }
-.day-total-bar .total-val { font-size: 18px; font-weight: 800; color: var(--green); }
+.shop-progress-label{
+  display:flex;justify-content:space-between;
+  font-size:12px;color:var(--text3);margin-bottom:6px;
+}
+.progress-track{height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:var(--text);border-radius:2px;transition:width .3s}
+.shop-cat-header{
+  font-size:10px;font-weight:700;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.8px;
+  margin:16px 0 6px;
+}
+.shop-item{
+  display:flex;align-items:center;gap:10px;
+  background:var(--bg2);border-radius:10px;
+  border:1px solid var(--border);padding:10px 12px;
+  margin-bottom:6px;cursor:pointer;transition:opacity .15s;
+}
+.shop-item.done{opacity:.35}
+.shop-item-check{
+  width:20px;height:20px;border-radius:6px;flex-shrink:0;
+  border:1.5px solid var(--border);display:flex;align-items:center;
+  justify-content:center;font-size:11px;transition:all .15s;
+}
+.shop-item.done .shop-item-check{
+  background:var(--text);border-color:var(--text);color:var(--bg);
+}
+.shop-item-text{flex:1}
+.shop-item-name{font-size:13px;font-weight:600}
+.shop-item-amt{font-size:11px;color:var(--text3);margin-top:1px}
 
-/* ━━━ WEEK STRIP ━━━ */
-.week-strip {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  padding-bottom: 4px;
-  margin-bottom: 16px;
+/* EXTRAS */
+.supp-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;
 }
-.week-strip::-webkit-scrollbar { display: none; }
-.week-day-btn {
-  flex-shrink: 0;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 10px 14px;
-  text-align: center;
-  cursor: pointer;
-  transition: all .15s;
-  min-width: 56px;
+.supp-name{font-size:14px;font-weight:700;margin-bottom:3px}
+.supp-dose{font-size:12px;color:var(--text2);margin-bottom:2px}
+.supp-timing{font-size:11px;color:var(--text3);margin-bottom:4px}
+.supp-note{font-size:11px;color:var(--text3);line-height:1.4}
+.storage-table{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);overflow:hidden;margin-bottom:12px;
 }
-.week-day-btn.active {
-  background: var(--accent);
-  border-color: var(--accent);
+.storage-row{
+  display:flex;align-items:center;padding:10px 14px;
+  border-bottom:1px solid var(--border);gap:12px;
 }
-.week-day-btn .wd-name {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text2);
-  display: block;
+.storage-row:last-child{border-bottom:none}
+.storage-food{flex:1;font-size:13px;font-weight:600}
+.storage-time{font-size:12px;color:var(--text2);font-weight:700}
+.storage-temp{font-size:11px;color:var(--text3)}
+.batch-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;
 }
-.week-day-btn.active .wd-name { color: #fff; }
-.week-day-btn .wd-kcal {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text);
-  display: block;
-  margin-top: 2px;
-}
-.week-day-btn.active .wd-kcal { color: rgba(255,255,255,.85); }
+.batch-day{font-size:13px;font-weight:700;color:var(--text2);margin-bottom:6px}
+.batch-task{font-size:12px;color:var(--text3);padding:3px 0 3px 12px;position:relative;line-height:1.4}
+.batch-task::before{content:"·";position:absolute;left:0}
 
-/* ━━━ MAHLZEITEN KARTEN ━━━ */
-.meals-filter {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  margin-bottom: 14px;
-  padding-bottom: 4px;
-}
-.meals-filter::-webkit-scrollbar { display: none; }
-.filter-btn {
-  flex-shrink: 0;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  color: var(--text2);
-  font-size: 13px;
-  font-weight: 600;
-  padding: 8px 16px;
-  transition: all .15s;
-}
-.filter-btn.active {
-  background: var(--text);
-  border-color: var(--text);
-  color: var(--bg);
+.hint-box{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:10px;padding:10px 14px;
+  font-size:12px;color:var(--text3);line-height:1.5;
 }
 
-.meal-card {
-  background: var(--bg3);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  overflow: hidden;
-  margin-bottom: 10px;
-  display: none;
+/* BOTTOM NAV */
+.bottom-nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:480px;
+  background:var(--bg2);border-top:1px solid var(--border);
+  display:flex;padding:8px 0;
+  padding-bottom:calc(8px + var(--safe-b));
+  z-index:100;
 }
-.meal-card.visible { display: block; }
-.meal-card-head {
-  padding: 16px 16px 12px;
+.nav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  gap:3px;padding:6px 0;color:var(--text3);transition:color .15s;
 }
-.meal-card-code {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 4px;
-}
-.meal-card-title {
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 3px;
-}
-.meal-card-time {
-  font-size: 12px;
-  color: var(--text2);
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-.macros-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0;
-  background: var(--bg2);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-}
-.macro-cell {
-  text-align: center;
-  padding: 10px 4px;
-  border-right: 1px solid var(--border);
-}
-.macro-cell:last-child { border-right: none; }
-.macro-cell-val {
-  font-size: 18px;
-  font-weight: 800;
-  display: block;
-}
-.macro-cell-val.kcal { color: var(--accent); }
-.macro-cell-val.prot { color: var(--green); }
-.macro-cell-val.carb { color: var(--orange); }
-.macro-cell-val.fat  { color: var(--red); }
-.macro-cell-label {
-  font-size: 10px;
-  color: var(--text3);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-.ingredients-list {
-  padding: 10px 16px 4px;
-}
-.ing-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 7px 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 14px;
-}
-.ing-row:last-child { border-bottom: none; }
-.ing-name { color: var(--text); }
-.ing-detail { color: var(--text2); font-size: 12px; font-weight: 500; }
-.meal-tip {
-  margin: 4px 16px 14px;
-  background: rgba(79,142,247,.1);
-  border-left: 3px solid var(--accent);
-  border-radius: 0 10px 10px 0;
-  padding: 10px 12px;
-  font-size: 13px;
-  color: var(--text2);
-  line-height: 1.5;
-}
+.nav-btn svg{width:20px;height:20px;stroke:currentColor}
+.nav-btn.active{color:var(--text)}
+.nav-label{font-size:9px;font-weight:600;letter-spacing:.3px}
 
-/* ━━━ EINKAUF ━━━ */
-.shop-section {
-  background: var(--bg3);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  overflow: hidden;
-  margin-bottom: 10px;
+/* MODAL */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.6);
+  z-index:200;display:flex;align-items:flex-end;
+  opacity:0;pointer-events:none;transition:opacity .25s;
 }
-.shop-section-header {
-  padding: 12px 16px;
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: var(--text2);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal-sheet{
+  background:var(--bg2);width:100%;max-width:480px;margin:0 auto;
+  border-radius:20px 20px 0 0;
+  max-height:92dvh;overflow-y:auto;
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);
+  -webkit-overflow-scrolling:touch;
+  position:relative;
 }
-.shop-item {
-  display: flex;
-  align-items: center;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border);
-  gap: 12px;
-  cursor: pointer;
-  transition: background .12s;
+.modal-overlay.open .modal-sheet{transform:translateY(0)}
+.modal-handle{
+  width:36px;height:4px;background:var(--bg3);border-radius:2px;
+  margin:10px auto 0;
 }
-.shop-item:last-child { border-bottom: none; }
-.shop-item:active { background: rgba(255,255,255,.03); }
-.shop-cb {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  border: 2px solid var(--text3);
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all .15s;
+.modal-close-btn{
+  position:absolute;top:14px;right:14px;
+  width:28px;height:28px;border-radius:50%;
+  background:rgba(0,0,0,.5);color:var(--text2);
+  font-size:12px;display:flex;align-items:center;justify-content:center;
+  z-index:5;backdrop-filter:blur(8px);
 }
-.shop-cb.checked {
-  background: var(--green);
-  border-color: var(--green);
+.modal-hero{
+  width:100%;height:220px;overflow:hidden;
+  background:var(--bg3);position:relative;
 }
-.shop-cb.checked::after {
-  content: '';
-  width: 6px;
-  height: 10px;
-  border: 2px solid #fff;
-  border-top: none;
-  border-left: none;
-  transform: rotate(45deg) translateY(-1px);
-  display: block;
+.modal-hero-img{
+  width:100%;height:100%;object-fit:cover;display:block;
 }
-.shop-name {
-  flex: 1;
-  font-size: 15px;
-  transition: color .15s;
+.modal-inner{padding:16px 16px 40px}
+.modal-cat{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.modal-title{font-size:20px;font-weight:800;letter-spacing:-.4px;margin-bottom:3px}
+.modal-time{font-size:12px;color:var(--text3);margin-bottom:14px}
+.modal-macros{display:flex;gap:6px;margin-bottom:14px}
+.modal-macro-box{
+  flex:1;background:var(--bg3);border-radius:10px;
+  border:1px solid var(--border);padding:8px 4px;text-align:center;
 }
-.shop-item.done .shop-name {
-  color: var(--text3);
-  text-decoration: line-through;
+.modal-macro-val{font-size:15px;font-weight:800;color:var(--text2);display:block}
+.modal-macro-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;display:block;margin-top:1px}
+.modal-section-title{
+  font-size:10px;font-weight:700;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;margin-top:16px;
 }
-.shop-qty {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text2);
+.ingredient-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 0;border-bottom:1px solid var(--border);
 }
-.shop-item.done .shop-qty { color: var(--text3); }
-
-.shop-progress-bar {
-  background: var(--bg2);
-  padding: 12px 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 14px;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
+.ingredient-row:last-child{border-bottom:none}
+.ingredient-name{font-size:13px;font-weight:500}
+.ingredient-amt{font-size:12px;color:var(--text2);font-weight:600}
+.step-row{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.step-row:last-child{border-bottom:none}
+.step-num{
+  width:22px;height:22px;border-radius:50%;flex-shrink:0;
+  background:var(--text);color:var(--bg);font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
 }
-.progress-track {
-  flex: 1;
-  height: 6px;
-  background: var(--bg);
-  border-radius: 3px;
-  overflow: hidden;
+.step-text{font-size:13px;font-weight:500;line-height:1.5}
+.step-hint{font-size:11px;color:var(--text3);margin-top:2px;line-height:1.4}
+.tip-box{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:10px;padding:10px 12px;margin-top:14px;
+  font-size:12px;color:var(--text2);line-height:1.5;
 }
-.progress-fill {
-  height: 100%;
-  background: var(--green);
-  border-radius: 3px;
-  transition: width .3s ease;
-}
-.progress-text {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--green);
-  white-space: nowrap;
-}
-
-/* ━━━ EXTRAS/SUPPLEMENTS ━━━ */
-.extra-card {
-  background: var(--bg3);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  padding: 16px;
-  margin-bottom: 10px;
-}
-.extra-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-.extra-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  flex-shrink: 0;
-}
-.extra-name { font-size: 16px; font-weight: 700; }
-.extra-sub { font-size: 12px; color: var(--text2); margin-top: 1px; }
-.extra-body { font-size: 14px; color: var(--text2); line-height: 1.6; }
-.extra-tag {
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 20px;
-  margin-top: 10px;
-}
-.extra-tag.go    { background: rgba(48,217,134,.15); color: var(--green); }
-.extra-tag.stop  { background: rgba(255,95,95,.15);  color: var(--red); }
-.extra-tag.maybe { background: rgba(255,159,58,.15); color: var(--orange); }
-
-.batch-card {
-  background: var(--bg3);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  padding: 16px;
-  margin-bottom: 10px;
-}
-.batch-title {
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.batch-step {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  margin-bottom: 10px;
-}
-.batch-step:last-child { margin-bottom: 0; }
-.batch-num {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--accent);
-  color: #fff;
-  font-size: 12px;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-.batch-text { font-size: 14px; color: var(--text2); line-height: 1.5; }
-.batch-text strong { color: var(--text); }
-
-/* ━━━ BOTTOM NAV ━━━ */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 480px;
-  background: rgba(13, 13, 20, 0.92);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
-  border-top: 1px solid var(--border);
-  display: flex;
-  padding: 10px 0 calc(10px + var(--safe-b));
-  z-index: 100;
-}
-.nav-btn {
-  flex: 1;
-  background: none;
-  border: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 0;
-  color: var(--text3);
-  transition: color .15s;
-}
-.nav-btn.active { color: var(--accent); }
-.nav-btn svg {
-  width: 24px;
-  height: 24px;
-}
-.nav-label {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.2px;
-}
-
-/* ━━━ DETAIL MODAL ━━━ */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.6);
-  z-index: 200;
-  display: none;
-  align-items: flex-end;
-  -webkit-backdrop-filter: blur(4px);
-  backdrop-filter: blur(4px);
-}
-.modal-overlay.open { display: flex; }
-.modal-sheet {
-  background: var(--bg2);
-  border-radius: 24px 24px 0 0;
-  width: 100%;
-  max-height: 90dvh;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  animation: slideUp .3s ease;
-}
-@keyframes slideUp {
-  from { transform: translateY(100%); }
-  to   { transform: translateY(0); }
-}
-.modal-handle {
-  width: 40px;
-  height: 4px;
-  background: var(--border);
-  border-radius: 2px;
-  margin: 12px auto 0;
-}
-.modal-close-btn {
-  position: absolute;
-  top: 12px;
-  right: 16px;
-  background: var(--bg3);
-  border: none;
-  color: var(--text2);
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.modal-inner { padding: 16px 16px calc(32px + var(--safe-b)); }
-.modal-tag {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 6px;
-}
-.modal-title {
-  font-size: 24px;
-  font-weight: 800;
-  margin-bottom: 4px;
-  letter-spacing: -0.3px;
-}
-.modal-subtitle {
-  font-size: 14px;
-  color: var(--text2);
-  margin-bottom: 16px;
-}
-
-/* ━━━ EMPTY / HINT ━━━ */
-.hint-box {
-  background: var(--bg3);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  padding: 20px;
-  text-align: center;
-  margin: 16px 0;
-}
-.hint-box p { color: var(--text2); font-size: 14px; line-height: 1.6; }
-
-/* iPad optimization */
-@media (min-width: 600px) {
-  #app { max-width: 600px; }
-  .bottom-nav { max-width: 600px; }
-  .modal-overlay .modal-sheet { max-width: 600px; margin: 0 auto; border-radius: 24px; }
-}
+.tip-box b{color:var(--text);font-weight:700}
 </style>
 </head>
 <body>
 <div id="app">
 
-  <!-- HEADER -->
-  <div class="app-header" id="mainHeader">
-    <div class="header-top">
-      <div>
-        <div class="header-greeting" id="headerGreeting">Guten Morgen,</div>
-        <div class="header-name">Sebastian 💪</div>
-      </div>
-      <div class="header-badge">Lean Bulk</div>
+<div class="app-header">
+  <div class="header-top">
+    <div>
+      <div class="header-greeting">Lean Bulk · Sebastian</div>
+      <div class="header-name" id="headerDayName">Heute</div>
     </div>
-    <div class="macro-strip" id="macroStrip">
-      <div class="macro-pill">
-        <span class="macro-pill-val kcal" id="stripKcal">3.284</span>
-        <span class="macro-pill-label">kcal</span>
-      </div>
-      <div class="macro-pill">
-        <span class="macro-pill-val prot" id="stripProt">165g</span>
-        <span class="macro-pill-label">Protein</span>
-      </div>
-      <div class="macro-pill">
-        <span class="macro-pill-val carb" id="stripCarb">440g</span>
-        <span class="macro-pill-label">Carbs</span>
-      </div>
-      <div class="macro-pill">
-        <span class="macro-pill-val fat" id="stripFat">90g</span>
-        <span class="macro-pill-label">Fett</span>
-      </div>
-    </div>
+    <div class="header-badge">LEAN BULK</div>
   </div>
-
-  <!-- PAGE: HEUTE -->
-  <div class="page active" id="pageHeute">
-    <div style="margin-bottom: 14px;">
-      <div class="week-strip" id="weekStrip"></div>
-    </div>
-
-    <div id="todayContent"></div>
-
-    <div class="hint-box" style="margin-top:8px;">
-      <p>💡 Tippe auf eine Mahlzeit für das volle Rezept mit Zutaten und Tipps.</p>
-    </div>
+  <div class="macro-strip">
+    <div class="macro-pill"><span class="macro-pill-val" id="stripKcal">–</span><span class="macro-pill-label">kcal</span></div>
+    <div class="macro-pill"><span class="macro-pill-val" id="stripProt">–</span><span class="macro-pill-label">Protein</span></div>
+    <div class="macro-pill"><span class="macro-pill-val" id="stripCarb">–</span><span class="macro-pill-label">Carbs</span></div>
+    <div class="macro-pill"><span class="macro-pill-val" id="stripFat">–</span><span class="macro-pill-label">Fett</span></div>
   </div>
-
-  <!-- PAGE: WOCHE -->
-  <div class="page" id="pageWoche">
-    <p class="section-label">Wochenübersicht</p>
-    <div id="weekOverview"></div>
-  </div>
-
-  <!-- PAGE: MAHLZEITEN -->
-  <div class="page" id="pageMahlzeiten">
-    <div class="meals-filter" id="mealsFilter">
-      <button class="filter-btn active" onclick="filterMeals('all', this)">Alle</button>
-      <button class="filter-btn" onclick="filterMeals('fruehstueck', this)">🌅 Frühstück</button>
-      <button class="filter-btn" onclick="filterMeals('mittagessen', this)">🍚 Mittag</button>
-      <button class="filter-btn" onclick="filterMeals('snack', this)">⚡ Snack</button>
-      <button class="filter-btn" onclick="filterMeals('abendessen', this)">🌙 Abend</button>
-    </div>
-    <div id="mealsContainer"></div>
-  </div>
-
-  <!-- PAGE: EINKAUF -->
-  <div class="page" id="pageEinkauf">
-    <div class="shop-progress-bar">
-      <div class="progress-track">
-        <div class="progress-fill" id="shopProgress" style="width:0%"></div>
-      </div>
-      <div class="progress-text" id="shopProgressText">0 / 31</div>
-    </div>
-    <div id="shopContainer"></div>
-  </div>
-
-  <!-- PAGE: EXTRAS -->
-  <div class="page" id="pageExtras">
-    <p class="section-label">Supplements</p>
-    <div id="supplementsContainer"></div>
-    <p class="section-label">Batch Cooking</p>
-    <div id="batchContainer"></div>
-  </div>
-
-  <!-- BOTTOM NAV -->
-  <nav class="bottom-nav">
-    <button class="nav-btn active" onclick="showPage('pageHeute', this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-      </svg>
-      <span class="nav-label">Heute</span>
-    </button>
-    <button class="nav-btn" onclick="showPage('pageWoche', this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>
-      </svg>
-      <span class="nav-label">Woche</span>
-    </button>
-    <button class="nav-btn" onclick="showPage('pageMahlzeiten', this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 2l18 10-18 10V2z"/>
-      </svg>
-      <span class="nav-label">Rezepte</span>
-    </button>
-    <button class="nav-btn" onclick="showPage('pageEinkauf', this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
-      </svg>
-      <span class="nav-label">Einkauf</span>
-    </button>
-    <button class="nav-btn" onclick="showPage('pageExtras', this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 2a5 5 0 015 5v3H7V7a5 5 0 015-5z"/><rect x="3" y="10" width="18" height="12" rx="2"/>
-      </svg>
-      <span class="nav-label">Extras</span>
-    </button>
-  </nav>
-
 </div>
 
-<!-- MODAL SHEET -->
+<div class="page active" id="pageHeute">
+  <div class="week-strip" id="weekStrip"></div>
+  <div id="todayContent"></div>
+  <div class="hint-box" style="margin-top:10px">💡 Tippe auf ein Gericht um das vollständige Rezept zu sehen.</div>
+</div>
+
+<div class="page" id="pageWoche">
+  <p class="section-label">Wochenplan</p>
+  <div id="weekOverview"></div>
+</div>
+
+<div class="page" id="pageMahlzeiten">
+  <div class="meals-filter">
+    <button class="filter-btn active" onclick="filterMeals('all',this)">Alle</button>
+    <button class="filter-btn" onclick="filterMeals('fruehstueck',this)">Frühstück</button>
+    <button class="filter-btn" onclick="filterMeals('hauptgericht',this)">Hauptgerichte</button>
+    <button class="filter-btn" onclick="filterMeals('snack',this)">Snacks</button>
+  </div>
+  <div id="mealsContainer"></div>
+</div>
+
+<div class="page" id="pageEinkauf">
+  <div class="shop-progress-wrap">
+    <div class="shop-progress-label">
+      <span>Einkaufsliste</span>
+      <span id="shopProgressText">0 erledigt</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="shopProgress" style="width:0%"></div></div>
+  </div>
+  <div id="shopContainer"></div>
+</div>
+
+<div class="page" id="pageExtras">
+  <p class="section-label">Supplements</p>
+  <div id="supplementsContainer"></div>
+  <p class="section-label">Kühlschrank · Haltbarkeit</p>
+  <div id="storageContainer"></div>
+  <p class="section-label">Batch Cooking</p>
+  <div class="hint-box" style="margin-bottom:10px">⏱️ 2× pro Woche kochen genügt — Sonntag + Mittwoch.</div>
+  <div id="batchContainer"></div>
+</div>
+
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="showPage('pageHeute',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <span class="nav-label">Heute</span>
+  </button>
+  <button class="nav-btn" onclick="showPage('pageWoche',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+    <span class="nav-label">Woche</span>
+  </button>
+  <button class="nav-btn" onclick="showPage('pageMahlzeiten',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a5 5 0 015 5v1H7V7a5 5 0 015-5z"/><rect x="3" y="8" width="18" height="13" rx="2"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="13" y2="16"/></svg>
+    <span class="nav-label">Rezepte</span>
+  </button>
+  <button class="nav-btn" onclick="showPage('pageEinkauf',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+    <span class="nav-label">Einkauf</span>
+  </button>
+  <button class="nav-btn" onclick="showPage('pageExtras',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+    <span class="nav-label">Extras</span>
+  </button>
+</nav>
+</div>
+
+<!-- MODAL -->
 <div class="modal-overlay" id="mealModal" onclick="closeModal(event)">
-  <div class="modal-sheet">
+  <div class="modal-sheet" id="modalSheet">
     <div class="modal-handle"></div>
-    <button class="modal-close-btn" onclick="document.getElementById('mealModal').classList.remove('open')">✕</button>
+    <button class="modal-close-btn" onclick="closeModal()">✕</button>
+    <div class="modal-hero" id="modalHero">
+      <img class="modal-hero-img" id="modalHeroImg" src="" alt="" onerror="this.parentElement.style.display='none'">
+    </div>
     <div class="modal-inner" id="modalContent"></div>
   </div>
 </div>
 
 <script>
-// ━━━ DATA ━━━
+const IMG_VERIFIED = {
+  // Frühstück – lokale Fotos wo vorhanden, sonst Unsplash
+  F1:"https://plus.unsplash.com/premium_photo-1668615553287-458a19327285?w=700&q=85&auto=format&fit=crop",
+  F2:"https://images.unsplash.com/photo-1525351484163-7529414344d8?w=700&q=85&auto=format&fit=crop",
+  F3:"https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=700&q=85&auto=format&fit=crop",
+  F4:"img/skyr-bowl.webp",
+  F5:"img/bagel-ei.webp",
+  F6:"https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=700&q=85&auto=format&fit=crop",
+  // Hauptgerichte – alle lokal
+  M1:"img/haehnchen-bowl.jpg",
+  M2:"img/rinderhack-reisbowl.jpg",
+  M3:"img/haehnchen-wrap.jpg",
+  M4:"img/haehnchen-kartoffel.jpg",
+  M5:"img/gyros-teller.jpg",
+  M6:"https://images.unsplash.com/photo-1612874742237-6526221588e3?w=700&q=85&auto=format&fit=crop",
+  M7:"img/koefte.jpg",
+  A1:"img/suesskartoffel-haehnchen.jpg",
+  A2:"img/kartoffel-hackfleisch.jpg",
+  A3:"img/pasta-haehnchen.jpg",
+  A5:"img/schnitzel-kartoffelp.webp",
+  // Snacks – Unsplash
+  S1:"https://images.unsplash.com/photo-1553530666-ba11a7da3888?w=700&q=85&auto=format&fit=crop",
+  S2:"https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=700&q=85&auto=format&fit=crop",
+  S3:"https://plus.unsplash.com/premium_photo-1699519510499-41b626d8522e?w=700&q=85&auto=format&fit=crop",
+  S4:"https://plus.unsplash.com/premium_photo-1663855531486-b8574bc255e0?w=700&q=85&auto=format&fit=crop",
+};
+
 const MEALS = {
-  F1: {
-    code: 'F1', cat: 'fruehstueck', emoji: '🌅',
-    name: 'Overnight Oats mit Protein',
-    time: '5 min · Abends vorbereiten',
-    kcal: 939, prot: 64.6, carb: 114.2, fat: 26.7,
-    tip: 'Abends alles mischen, in Kühlschrank stellen. Morgens Banane + Nüsse drauf.',
-    ingredients: [
-      { name: 'Haferflocken', amt: '100g', kcal: 379 },
-      { name: 'Skyr (Arla Natur)', amt: '150g', kcal: 98 },
-      { name: 'Whey Protein', amt: '30g', kcal: 112 },
-      { name: 'Milch 3,5%', amt: '200ml', kcal: 128 },
-      { name: 'Banane', amt: '120g', kcal: 107 },
-      { name: 'Mandeln', amt: '20g', kcal: 115 },
+  F1:{code:"F1",cat:"fruehstueck",
+    name:"Overnight Oats mit Protein",time:"5 min · Abends vorbereiten",
+    kcal:939,prot:64.6,carb:114.2,fat:26.7,
+    tip:"Abends 5 Min. vorbereiten, morgens fertig. Skyr macht es cremig und gibt Protein.",
+    ingredients:[
+      {name:"Haferflocken",amt:"100g"},
+      {name:"Skyr (Arla Natur)",amt:"150g"},
+      {name:"Whey Protein",amt:"30g"},
+      {name:"Milch 3,5%",amt:"200ml"},
+      {name:"Banane",amt:"120g"},
+      {name:"Mandeln",amt:"20g"},
+    ],
+    steps:[
+      {t:"Haferflocken, Skyr, Whey und Milch in ein Glas oder eine Dose geben.",h:""},
+      {t:"Alles gut verrühren bis kein Proteinpulver-Klumpen mehr sichtbar ist.",h:"Skyr schlägt Proteinpulver-Klumpen auf."},
+      {t:"Abdecken und mind. 6 Std. (oder über Nacht) in den Kühlschrank stellen.",h:""},
+      {t:"Morgens: Banane in Scheiben schneiden und Mandeln drüber geben.",h:""},
     ]
   },
-  F2: {
-    code: 'F2', cat: 'fruehstueck', emoji: '🌅',
-    name: 'Rührei mit Toast & Aufschnitt',
-    time: '10 min',
-    kcal: 951, prot: 65.5, carb: 61.6, fat: 48.6,
-    tip: '5 Eier scrambled (kein Öl nötig mit guter Antihaft-Pfanne). 4 Toast toasten, Frischkäse drauf.',
-    ingredients: [
-      { name: 'Eier (5 Stück)', amt: '300g', kcal: 450 },
-      { name: 'Vollkorntoast', amt: '4 Scheiben (140g)', kcal: 336 },
-      { name: 'Frischkäse (Philadelphia)', amt: '35g', kcal: 93 },
-      { name: 'Putenaufschnitt', amt: '70g', kcal: 72 },
+  F2:{code:"F2",cat:"fruehstueck",flexible:true,
+    name:"Rührei mit Toast & Aufschnitt",time:"10 min",
+    kcal:951,prot:65.5,carb:61.6,fat:48.6,
+    tip:"Kein Öl nötig – Antihaft-Pfanne auf mittlere Hitze, Eier rein, langsam schieben.",
+    ingredients:[
+      {name:"Eier (5 Stück)",amt:"300g"},
+      {name:"Vollkorntoast",amt:"4 Scheiben (140g)"},
+      {name:"Frischkäse (Philadelphia)",amt:"35g"},
+      {name:"Putenaufschnitt",amt:"70g"},
+    ],
+    steps:[
+      {t:"Eier in eine Schüssel aufschlagen, mit Salz und Pfeffer verquirlen.",h:""},
+      {t:"Antihaft-Pfanne auf mittlere Hitze (kein Öl). Eier rein.",h:"Zu heiß → trocken. Mittlere Hitze = cremig."},
+      {t:"Mit Spatel von außen nach innen schieben, bis Eier stocken. Vom Herd wenn noch leicht glänzend.",h:"Eier garen noch nach."},
+      {t:"Toast toasten, mit Frischkäse bestreichen. Putenaufschnitt drauf.",h:""},
     ]
   },
-  F3: {
-    code: 'F3', cat: 'fruehstueck', emoji: '🌅',
-    name: 'Protein Pancakes',
-    time: '15 min · Für gemütliche Morgen',
-    kcal: 891, prot: 80.5, carb: 79.5, fat: 28.9,
-    tip: 'Haferflocken fein mixen, mit Eiern + Whey verquirlen, in Antihaft-Pfanne ohne Öl ausbacken.',
-    ingredients: [
-      { name: 'Haferflocken (gemahlen)', amt: '100g', kcal: 379 },
-      { name: 'Eier (3 Stück)', amt: '180g', kcal: 270 },
-      { name: 'Whey Protein', amt: '30g', kcal: 112 },
-      { name: 'Skyr (Topping)', amt: '200g', kcal: 130 },
+  F3:{code:"F3",cat:"fruehstueck",
+    name:"Protein Pancakes",time:"15 min",
+    kcal:891,prot:80.5,carb:79.5,fat:28.9,
+    tip:"Haferflocken fein mixen = bessere Konsistenz. Ohne Öl in Antihaft-Pfanne.",
+    ingredients:[
+      {name:"Haferflocken (gemahlen)",amt:"100g"},
+      {name:"Eier (3 Stück)",amt:"180g"},
+      {name:"Whey Protein",amt:"30g"},
+      {name:"Skyr (Topping)",amt:"200g"},
+    ],
+    steps:[
+      {t:"Haferflocken im Mixer zu Mehl mahlen.",h:"Je feiner, desto fluffiger die Pancakes."},
+      {t:"Mit Eiern und Whey in einer Schüssel verquirlen. 3–5 Min. quellen lassen.",h:"Der Teig zieht etwas an – das ist normal."},
+      {t:"Antihaft-Pfanne auf mittlere Hitze (kein Öl). Teig in kleinen Portionen ausgießen.",h:"Klein halten → einfacher zu wenden."},
+      {t:"Wenden wenn Oberseite beginnt fest zu werden (ca. 2 Min.). Weitere 1–2 Min. fertig backen.",h:""},
+      {t:"Mit Skyr und Honig oder Beeren servieren.",h:""},
     ]
   },
-  F4: {
-    code: 'F4', cat: 'fruehstueck', emoji: '🌅',
-    name: 'Skyr Bowl',
-    time: '5 min · Einfach & sättigend',
-    kcal: 796, prot: 58.4, carb: 97.0, fat: 18.8,
-    tip: 'Skyr in Bowl, alles drauf, Schokolade grob hacken. Fertig.',
-    ingredients: [
-      { name: 'Skyr', amt: '450g', kcal: 293 },
-      { name: 'Apfel', amt: '150g', kcal: 78 },
-      { name: 'Banane', amt: '120g', kcal: 107 },
-      { name: 'Puffreis', amt: '25g', kcal: 90 },
-      { name: 'Mandeln', amt: '20g', kcal: 115 },
-      { name: 'Schokolade 85%', amt: '15g', kcal: 83 },
-      { name: 'Honig', amt: '10g', kcal: 30 },
+  F4:{code:"F4",cat:"fruehstueck",flexible:true,
+    name:"Skyr Bowl",time:"5 min",
+    kcal:796,prot:58.4,carb:97.0,fat:18.8,
+    tip:"Schnellstes Frühstück im Plan. Skyr direkt aus dem Kühlschrank, alles drauf.",
+    ingredients:[
+      {name:"Skyr",amt:"450g"},
+      {name:"Apfel",amt:"150g"},
+      {name:"Banane",amt:"120g"},
+      {name:"Puffreis",amt:"25g"},
+      {name:"Mandeln",amt:"20g"},
+      {name:"Schokolade 85%",amt:"15g"},
+      {name:"Honig",amt:"10g"},
+    ],
+    steps:[
+      {t:"Skyr in eine große Bowl geben.",h:""},
+      {t:"Apfel in Würfel schneiden, Banane in Scheiben.",h:""},
+      {t:"Puffreis, Mandeln und grob gehackte Schokolade drüber.",h:""},
+      {t:"Mit Honig beträufeln.",h:""},
     ]
   },
-  M1: {
-    code: 'M1', cat: 'mittagessen', emoji: '🍚',
-    name: 'Hähnchen-Reis Bowl',
-    time: '20 min · Batch Cooking empfohlen',
-    kcal: 856, prot: 69.9, carb: 116.8, fat: 11.1,
-    tip: '3–4 Portionen auf einmal kochen → 3 Tage haltbar. Hähnchen würzen, in Pfanne mit minimalem Öl anbraten.',
-    ingredients: [
-      { name: 'Hähnchenbrust', amt: '250g', kcal: 275 },
-      { name: 'Reis (roh)', amt: '140g', kcal: 491 },
-      { name: 'Gemüse (Brokkoli/Paprika)', amt: '150g', kcal: 45 },
-      { name: 'Olivenöl (Bratöl)', amt: '5g', kcal: 45 },
+  F5:{code:"F5",cat:"fruehstueck",flexible:true,
+    name:"Bagel Frühstück",time:"10 min",
+    kcal:1070,prot:65.0,carb:99.5,fat:42.0,
+    tip:"Bagels toasten bis knusprig – dann hält der Frischkäse besser und schmeckt wärmer.",
+    ingredients:[
+      {name:"Eier (4 Stück)",amt:"240g"},
+      {name:"Frischkäse (Philadelphia)",amt:"60g"},
+      {name:"Putenaufschnitt",amt:"100g"},
+      {name:"Bagels",amt:"2 Stück (~200g)"},
+    ],
+    steps:[
+      {t:"Bagels halbieren und im Toaster oder Backofen (200°C, 5 Min.) rösten.",h:""},
+      {t:"Eier aufschlagen, verquirlen, mit Salz und Pfeffer würzen.",h:""},
+      {t:"Antihaft-Pfanne auf mittlere Hitze. Eier als cremiges Rührei zubereiten (kein Öl).",h:"Vom Herd während noch leicht glänzend."},
+      {t:"Bagel-Hälften mit Frischkäse bestreichen.",h:""},
+      {t:"Putenaufschnitt und Rührei drauf. Mit Pfeffer oder Schnittlauch abschmecken.",h:""},
     ]
   },
-  M2: {
-    code: 'M2', cat: 'mittagessen', emoji: '🍚',
-    name: 'Rinderhack-Reisbowl',
-    time: '20 min',
-    kcal: 906, prot: 45.3, carb: 111.9, fat: 33.0,
-    tip: 'Hack krümelig anbraten — kein Öl nötig, das Hack bringt eigenes Fett mit. Paprika + Zwiebeln dazu.',
-    ingredients: [
-      { name: 'Rinderhack (~15% Fett)', amt: '180g', kcal: 360 },
-      { name: 'Reis (roh)', amt: '130g', kcal: 456 },
-      { name: 'Paprika / Zwiebeln', amt: '150g', kcal: 45 },
-      { name: 'Olivenöl (minimal)', amt: '5g', kcal: 45 },
+  F6:{code:"F6",cat:"fruehstueck",
+    name:"French Toast mit Magerquark",time:"15 min",
+    kcal:1155,prot:63.5,carb:106.7,fat:33.6,
+    tip:"Magerquark statt Nutella als Topping – viel Protein, gleiche Cremigkeit.",
+    ingredients:[
+      {name:"Vollkorntoast",amt:"4 Scheiben (140g)"},
+      {name:"Eier (3 Stück)",amt:"180g"},
+      {name:"Milch 3,5%",amt:"100ml"},
+      {name:"Magerquark",amt:"200g"},
+      {name:"Honig",amt:"15g"},
+      {name:"Banane",amt:"100g"},
+      {name:"Butter",amt:"5g"},
+    ],
+    steps:[
+      {t:"Eier, Milch, 1 Prise Zimt in einer flachen Schüssel verquirlen.",h:""},
+      {t:"Jede Toastscheibe beidseitig 5–10 Sek. in die Eier-Milch-Mischung tauchen.",h:"Nicht zu lang – sonst wird Toast matschig."},
+      {t:"Butter in Pfanne bei mittlerer Hitze. Toast einlegen, 2–3 Min. pro Seite goldbraun braten.",h:"Nur einmal wenden."},
+      {t:"Magerquark mit Honig cremig verrühren.",h:""},
+      {t:"Toast anrichten, Quark drauf, Banane in Scheiben.",h:""},
     ]
   },
-  M3: {
-    code: 'M3', cat: 'mittagessen', emoji: '🍚',
-    name: 'Hähnchen Wrap',
-    time: '15 min',
-    kcal: 821, prot: 63.4, carb: 59.4, fat: 35.9,
-    tip: 'Fleisch würzen und anbraten. Wraps erwärmen. Gemüse + Käse rein, Creme fraîche als Sauce.',
-    ingredients: [
-      { name: 'Hähnchenbrust', amt: '180g', kcal: 198 },
-      { name: 'Tortilla Wraps', amt: '2 Stück (100g)', kcal: 321 },
-      { name: 'Streukäse Gouda', amt: '40g', kcal: 105 },
-      { name: 'Creme fraîche', amt: '50g', kcal: 173 },
-      { name: 'Gemüse (Paprika/Salat)', amt: '80g', kcal: 24 },
+  M1:{code:"M1",cat:"hauptgericht",
+    name:"Hähnchen-Reis Bowl",time:"20 min · Batch Cooking empfohlen",
+    kcal:856,prot:69.9,carb:116.8,fat:11.1,
+    tip:"3–4 Portionen auf einmal kochen → 3–4 Tage haltbar. Ideal für Wochenanfang.",
+    ingredients:[
+      {name:"Hähnchenbrust",amt:"250g"},
+      {name:"Reis (roh)",amt:"140g"},
+      {name:"Brokkoli / Paprika",amt:"150g"},
+      {name:"Olivenöl",amt:"5g"},
+    ],
+    steps:[
+      {t:"Reis nach Packungsanleitung kochen (ca. 20 Min.).",h:"Verhältnis 1:2 (Reis:Wasser), Salz ins Wasser."},
+      {t:"Hähnchenbrust in 2 cm Würfel schneiden. Mit Salz, Pfeffer, Paprikapulver würzen.",h:""},
+      {t:"Pfanne auf mittelhohe Hitze, 5g Olivenöl. Hähnchen 3–4 Min. pro Seite anbraten.",h:"Nicht zu oft wenden – Kruste bildet sich nur bei Ruhe."},
+      {t:"Brokkoli/Paprika in letzten 5 Min. mitdämpfen oder separat kochen.",h:"Brokkoli 3 Min. = knackig, 5 Min. = weich."},
+      {t:"Bowl zusammenstellen: Reis → Gemüse → Hähnchen.",h:""},
     ]
   },
-  S1: {
-    code: 'S1', cat: 'snack', emoji: '⚡',
-    name: 'Protein Shake + Banane',
-    time: '2 min',
-    kcal: 448, prot: 41.9, carb: 46.0, fat: 13.6,
-    tip: 'Ideal als Workout-Snack. Alternative ohne Pulver: 300g Skyr + Banane + 15g Mandeln (388 kcal, 37g P).',
-    ingredients: [
-      { name: 'Whey Protein', amt: '40g', kcal: 149 },
-      { name: 'Milch 3,5%', amt: '300ml', kcal: 192 },
-      { name: 'Banane', amt: '120g', kcal: 107 },
+  M2:{code:"M2",cat:"hauptgericht",
+    name:"Rinderhack-Reisbowl",time:"20 min",
+    kcal:906,prot:45.3,carb:111.9,fat:33.0,
+    tip:"Hack auf hoher Hitze anbraten – kein Öl nötig. Paprika und Zwiebeln geben das Aroma.",
+    ingredients:[
+      {name:"Rinderhack (~15% Fett)",amt:"180g"},
+      {name:"Reis (roh)",amt:"130g"},
+      {name:"Paprika / Zwiebeln",amt:"150g"},
+      {name:"Olivenöl (minimal)",amt:"5g"},
+    ],
+    steps:[
+      {t:"Reis aufsetzen und kochen.",h:""},
+      {t:"Paprika und Zwiebeln würfeln.",h:""},
+      {t:"Pfanne auf hohe Hitze (kein Öl). Hack krümelig braten bis kein Rosa mehr zu sehen (5–7 Min.).",h:"Hack bringt eigenes Fett mit – kein Öl nötig."},
+      {t:"Hitze auf mittel. Paprika + Zwiebeln dazu, 3–4 Min. mitbraten.",h:""},
+      {t:"Würzen: Salz, Pfeffer, Paprikapulver, Knoblauch. Über Reis servieren.",h:""},
     ]
   },
-  S2: {
-    code: 'S2', cat: 'snack', emoji: '⚡',
-    name: 'Skyr Bowl mit Extras',
-    time: '5 min',
-    kcal: 521, prot: 37.0, carb: 61.9, fat: 12.9,
-    tip: 'Skyr in Bowl, Granola drauf, Apfel + Schokolade + Honig. Einfach und sättigend.',
-    ingredients: [
-      { name: 'Skyr', amt: '300g', kcal: 195 },
-      { name: 'Granola', amt: '30g', kcal: 135 },
-      { name: 'Apfel', amt: '150g', kcal: 78 },
-      { name: 'Schokolade 85%', amt: '15g', kcal: 83 },
-      { name: 'Honig', amt: '10g', kcal: 30 },
+  M3:{code:"M3",cat:"hauptgericht",
+    name:"Hähnchen Wrap",time:"15 min",
+    kcal:821,prot:63.4,carb:59.4,fat:35.9,
+    tip:"Wraps kurz in der Pfanne erwärmen – dann lassen sie sich besser rollen.",
+    ingredients:[
+      {name:"Hähnchenbrust",amt:"180g"},
+      {name:"Tortilla Wraps",amt:"2 Stück (100g)"},
+      {name:"Streukäse Gouda",amt:"40g"},
+      {name:"Creme fraîche",amt:"50g"},
+      {name:"Gemüse (Paprika/Salat)",amt:"80g"},
+    ],
+    steps:[
+      {t:"Hähnchenbrust in dünne Streifen schneiden. Mit Salz, Pfeffer, Paprikapulver würzen.",h:""},
+      {t:"Pfanne auf hohe Hitze. Hähnchen 3–4 Min. scharf anbraten, wenden.",h:"Wirklich heiß – sonst dampft das Hähnchen statt zu braten."},
+      {t:"Wraps kurz in derselben Pfanne (30 Sek.) oder Mikrowelle (20 Sek.) erwärmen.",h:""},
+      {t:"Creme fraîche auf Wrap streichen. Hähnchen, Gemüse, Käse drauf.",h:""},
+      {t:"Einrollen: unten einschlagen, dann von einer Seite rollen.",h:""},
     ]
   },
-  A1: {
-    code: 'A1', cat: 'abendessen', emoji: '🌙',
-    name: 'Hähnchen mit Süßkartoffeln',
-    time: '25 min · Ofen + Pfanne',
-    kcal: 623, prot: 64.3, carb: 68.4, fat: 11.2,
-    tip: 'Süßkartoffeln würfeln, mit 5g Öl + Gewürzen bei 200°C 20 min in den Ofen. Hähnchen parallel in Pfanne.',
-    ingredients: [
-      { name: 'Hähnchenbrust', amt: '250g', kcal: 275 },
-      { name: 'Süßkartoffeln', amt: '300g', kcal: 258 },
-      { name: 'Gemüse', amt: '150g', kcal: 45 },
-      { name: 'Olivenöl (für Ofen)', amt: '5g', kcal: 45 },
+  M4:{code:"M4",cat:"hauptgericht",
+    name:"Hähnchen-Gemüse Pfanne",time:"25 min",
+    kcal:812,prot:70.0,carb:61.0,fat:30.0,
+    tip:"Kartoffeln zuerst anbraten – sie brauchen am längsten. Schmand macht es cremig ohne viel Fett.",
+    ingredients:[
+      {name:"Hähnchenbrust",amt:"250g"},
+      {name:"Kartoffeln",amt:"300g"},
+      {name:"Brokkoli",amt:"150g"},
+      {name:"Paprika",amt:"100g"},
+      {name:"Schmand",amt:"75g"},
+      {name:"Olivenöl",amt:"8g"},
+    ],
+    steps:[
+      {t:"Kartoffeln schälen, in 1–2 cm Würfel schneiden.",h:"Gleichgroße Würfel garen gleichmäßig."},
+      {t:"Pfanne mit Öl auf mittlerer Hitze. Kartoffeln 10–12 Min. anbraten, bis goldbraun.",h:"Deckel drauf → garen schneller durch."},
+      {t:"Hähnchenbrust würfeln. Mit Salz, Pfeffer, Paprikapulver, Knoblauchpulver würzen.",h:""},
+      {t:"Hähnchen zu den Kartoffeln, Hitze erhöhen. 4–5 Min. scharf mitbraten.",h:""},
+      {t:"Brokkoli-Röschen und Paprikawürfel dazu, 3–4 Min. mitbraten.",h:"Brokkoli soll leuchtend grün bleiben."},
+      {t:"Hitze auf niedrig, Schmand unterrühren. 1 Min. köcheln. Abschmecken.",h:""},
     ]
   },
-  A2: {
-    code: 'A2', cat: 'abendessen', emoji: '🌙',
-    name: 'Rinderhack-Pfanne mit Kartoffeln',
-    time: '20 min',
-    kcal: 760, prot: 49.8, carb: 57.9, fat: 38.4,
-    tip: 'Kartoffeln würfeln, in Pfanne anbraten (5g Öl). Hack dazu — brät im eigenen Fett.',
-    ingredients: [
-      { name: 'Rinderhack (~15% Fett)', amt: '220g', kcal: 440 },
-      { name: 'Kartoffeln', amt: '350g', kcal: 245 },
-      { name: 'Gemüse / Zwiebel', amt: '100g', kcal: 30 },
-      { name: 'Olivenöl (minimal)', amt: '5g', kcal: 45 },
+  M5:{code:"M5",cat:"hauptgericht",
+    name:"Gyros Teller mit Tzatziki",time:"20 min",
+    kcal:853,prot:92.3,carb:76.0,fat:19.2,
+    tip:"Magerquark statt Joghurt im Tzatziki = fast doppelt so viel Protein. Gurke wirklich gut ausdrücken.",
+    ingredients:[
+      {name:"Hähnchenbrust (Gyros-Gewürz)",amt:"250g"},
+      {name:"Pita-Brot",amt:"2 Stück (120g)"},
+      {name:"Magerquark (Tzatziki)",amt:"150g"},
+      {name:"Gurke",amt:"100g"},
+      {name:"Knoblauch",amt:"1 Zehe"},
+      {name:"Olivenöl",amt:"5g"},
+      {name:"Tomaten",amt:"100g"},
+      {name:"Feta",amt:"30g"},
+    ],
+    steps:[
+      {t:"Hähnchenbrust in dünne Streifen schneiden (quer zur Faser). Mit Gyros-Gewürz einreiben.",h:""},
+      {t:"Tzatziki: Gurke fein reiben, gut ausdrücken. Mit Magerquark, Knoblauch, Öl, Salz verrühren. Kalt stellen.",h:"Gurke wirklich gut ausdrücken – sonst wird Tzatziki wässrig."},
+      {t:"Pfanne auf hohe Hitze (kein Öl). Hähnchen portionsweise 2–3 Min. pro Seite braten.",h:"Portionsweise – zu viel Fleisch gleichzeitig → dampft statt brät."},
+      {t:"Pita-Brot kurz erwärmen (Pfanne oder Toaster).",h:""},
+      {t:"Teller anrichten: Pita, Hähnchen, Tzatziki, Tomaten, Feta.",h:""},
     ]
   },
-  A3: {
-    code: 'A3', cat: 'abendessen', emoji: '🌙',
-    name: 'Pasta mit Hähnchen & Mozzarella',
-    time: '20 min',
-    kcal: 1041, prot: 76.2, carb: 119.9, fat: 26.9,
-    tip: 'Pasta kochen. Hähnchen anbraten, Passata dazu, aufkochen. Pasta dazu, Mozzarella drüber schmelzen.',
-    ingredients: [
-      { name: 'Pasta (Penne/Rigatoni)', amt: '150g roh', kcal: 525 },
-      { name: 'Hähnchenbrust', amt: '180g', kcal: 198 },
-      { name: 'Passata', amt: '200g', kcal: 70 },
-      { name: 'Mozzarella', amt: '80g', kcal: 203 },
-      { name: 'Olivenöl (minimal)', amt: '5g', kcal: 45 },
+  M6:{code:"M6",cat:"hauptgericht",
+    name:"Pasta Carbonara mit Hähnchen",time:"20 min",
+    kcal:980,prot:88.0,carb:91.0,fat:27.0,
+    tip:"Eier nie in heiße Pasta – erst Pfanne vom Herd, dann schnell vermischen. So stocken die Eier nicht.",
+    ingredients:[
+      {name:"Pasta (Spaghetti/Rigatoni)",amt:"120g roh"},
+      {name:"Hähnchenbrust",amt:"180g"},
+      {name:"Eier (2 Stück)",amt:"120g"},
+      {name:"Parmesan (gerieben)",amt:"25g"},
+      {name:"Magerquark",amt:"80g"},
+      {name:"Olivenöl",amt:"5g"},
+    ],
+    steps:[
+      {t:"Pasta in gut gesalzenem Wasser al dente kochen. 1 Tasse Pastawasser aufheben!",h:"Pastawasser = Geheimwaffe für cremige Sauce."},
+      {t:"Eier, Magerquark und Parmesan in einer Schüssel verrühren. Pfeffer großzügig dazu.",h:"Magerquark macht es cremig und gibt extra Protein."},
+      {t:"Hähnchenbrust würfeln, würzen. In Pfanne mit Öl scharf anbraten.",h:""},
+      {t:"Pasta abgießen, kurz (1 Min.) abkühlen. Hähnchen in die Pfanne zur Pasta.",h:"Abkühlen ist wichtig – sonst stocken die Eier."},
+      {t:"Pfanne vom Herd. Ei-Quark-Käse-Mix drüber, schnell und kräftig vermengen.",h:"Immer rühren – Pfanne NIE wieder auf den Herd."},
+      {t:"Pastawasser schluckweise dazu geben bis cremige Konsistenz erreicht ist.",h:"Weniger ist mehr – lieber 2x nachgeben."},
+    ]
+  },
+  M7:{code:"M7",cat:"hauptgericht",
+    name:"Türkische Köfte mit Reis",time:"25 min",
+    kcal:980,prot:52.8,carb:117.1,fat:34.7,
+    tip:"Köfte kann man super auf Vorrat machen – roh portionieren und einfrieren. Direkt aus der Tiefkühle in die Pfanne.",
+    ingredients:[
+      {name:"Rinderhack (~15% Fett)",amt:"200g"},
+      {name:"Reis (roh)",amt:"130g"},
+      {name:"Zwiebel",amt:"60g"},
+      {name:"Paprika (Beilage)",amt:"100g"},
+    ],
+    steps:[
+      {t:"Reis kochen. Zwiebel sehr fein reiben oder hacken.",h:"Geriebene Zwiebel macht Köfte saftiger."},
+      {t:"Hack mit Zwiebel, Kreuzkümmel, Paprikapulver, Knoblauch, Salz, Pfeffer mind. 2 Min. kneten.",h:"Das Kneten macht Köfte fester und saftiger."},
+      {t:"Aus der Hackmasse 6–8 kleine längliche Rollen formen.",h:"Alle gleich groß → gleichmäßiges Garen."},
+      {t:"Pfanne ohne Öl auf mittelhohe Hitze. Köfte von allen Seiten 2–3 Min. anbraten.",h:"Hack hat genug Eigenfett – kein Öl nötig."},
+      {t:"Joghurt mit Salz und Knoblauch verrühren. Teller anrichten: Reis, Köfte, Joghurt-Dip, Paprika.",h:""},
+    ]
+  },
+  A1:{code:"A1",cat:"hauptgericht",
+    name:"Hähnchen mit Süßkartoffeln",time:"25 min · Ofen + Pfanne",
+    kcal:623,prot:64.3,carb:68.4,fat:11.2,
+    tip:"Süßkartoffeln und Hähnchen laufen parallel. Ofen an, Hähnchen in die Pfanne.",
+    ingredients:[
+      {name:"Hähnchenbrust",amt:"250g"},
+      {name:"Süßkartoffeln",amt:"300g"},
+      {name:"Gemüse (Zucchini/Paprika)",amt:"150g"},
+      {name:"Olivenöl",amt:"5g"},
+    ],
+    steps:[
+      {t:"Backofen auf 200°C vorheizen.",h:""},
+      {t:"Süßkartoffeln schälen, in 2 cm Würfel. Mit 5g Öl, Salz, Paprikapulver vermengen.",h:""},
+      {t:"Auf Backblech verteilen (nicht übereinander!), 20 Min. backen. Nach 10 Min. wenden.",h:"Nicht übereinander – sonst dämpfen statt rösten."},
+      {t:"Hähnchenbrust würzen, in Antihaft-Pfanne 4–5 Min. pro Seite anbraten.",h:""},
+      {t:"Gemüse in letzten 5 Min. zum Hähnchen oder separat dämpfen.",h:""},
+    ]
+  },
+  A2:{code:"A2",cat:"hauptgericht",
+    name:"Rinderhack-Pfanne mit Kartoffeln",time:"20 min",
+    kcal:760,prot:49.8,carb:57.9,fat:38.4,
+    tip:"Kartoffeln zuerst anbraten – sie brauchen am längsten. Hack hat sein eigenes Fett.",
+    ingredients:[
+      {name:"Rinderhack (~15% Fett)",amt:"220g"},
+      {name:"Kartoffeln",amt:"350g"},
+      {name:"Zwiebel / Gemüse",amt:"100g"},
+      {name:"Olivenöl",amt:"5g"},
+    ],
+    steps:[
+      {t:"Kartoffeln schälen, in 1–2 cm Würfel schneiden.",h:""},
+      {t:"Pfanne mit 5g Öl auf mittlerer Hitze. Kartoffeln 10–12 Min. anbraten bis goldbraun.",h:"Deckel drauf für schnelleres Durchgaren."},
+      {t:"Hitze erhöhen. Rinderhack dazu, krümelig anbraten bis kein Rosa mehr sichtbar (5–7 Min.).",h:"Kein extra Öl nötig."},
+      {t:"Zwiebel und Gemüse dazu, 3–4 Min. mitbraten. Würzen.",h:""},
+    ]
+  },
+  A3:{code:"A3",cat:"hauptgericht",
+    name:"Pasta mit Hähnchen & Mozzarella",time:"20 min",
+    kcal:1041,prot:76.2,carb:119.9,fat:26.9,
+    tip:"Etwas Pastawasser aufheben – macht die Sauce sämiger. Mozzarella zuletzt drüber schmelzen.",
+    ingredients:[
+      {name:"Pasta (Penne/Rigatoni)",amt:"150g roh"},
+      {name:"Hähnchenbrust",amt:"180g"},
+      {name:"Passata",amt:"200g"},
+      {name:"Mozzarella",amt:"80g"},
+      {name:"Olivenöl",amt:"5g"},
+    ],
+    steps:[
+      {t:"Pasta in gut gesalzenem Wasser kochen (Packungsangabe).",h:""},
+      {t:"Hähnchenbrust würfeln. In Pfanne mit 5g Öl scharf anbraten.",h:""},
+      {t:"Passata dazu, aufkochen, 5 Min. köcheln. Mit Salz, Pfeffer, Basilikum abschmecken.",h:""},
+      {t:"Pasta abgießen (etwas Pastawasser aufheben!). Mit Hähnchen-Sauce vermengen.",h:""},
+      {t:"Mozzarella in Stücke reißen, drüber. Pfanne kurz abdecken bis Käse schmilzt (2 Min.).",h:""},
+    ]
+  },
+  A5:{code:"A5",cat:"hauptgericht",
+    name:"Kalbsschnitzel mit Kartoffelpüree",time:"30 min",
+    kcal:986,prot:71.8,carb:86.1,fat:31.9,
+    tip:"Kein Kalbsschnitzel? Hähnchenbrust dünn klopfen funktioniert als Ersatz. Schnitzel soll im Öl schwimmen.",
+    ingredients:[
+      {name:"Kalbsschnitzel",amt:"250g"},
+      {name:"Ei (Panade)",amt:"1 Stück"},
+      {name:"Semmelbrösel",amt:"40g"},
+      {name:"Kartoffeln",amt:"350g"},
+      {name:"Milch 3,5%",amt:"100ml"},
+      {name:"Butter",amt:"10g"},
+      {name:"Olivenöl (für Pfanne)",amt:"5g"},
+    ],
+    steps:[
+      {t:"Kartoffeln schälen, würfeln, in Salzwasser 15–20 Min. kochen bis weich.",h:"Gleichgroße Würfel garen gleichmäßig."},
+      {t:"Schnitzel falls dicker als 1 cm: in Folie wickeln und flach klopfen.",h:""},
+      {t:"Drei Teller: Mehl (optional), verquirltes Ei, Semmelbrösel. Schnitzel nacheinander wenden.",h:"Mehl gibt bessere Haftung der Panade."},
+      {t:"Pfanne mit Öl auf mittlerer Hitze. Schnitzel 2–3 Min. pro Seite goldbraun braten.",h:"Mehr Öl = bessere, gleichmäßigere Panade."},
+      {t:"Kartoffeln abgießen, ausdämpfen lassen. Mit Butter, heißer Milch, Salz, Muskat stampfen.",h:"Heiße Milch = cremigeres Püree."},
+      {t:"Schnitzel auf Küchenpapier abtropfen. Mit Püree servieren, Zitrone drüber.",h:""},
+    ]
+  },
+  S1:{code:"S1",cat:"snack",
+    name:"Protein Shake + Banane",time:"2 min",
+    kcal:448,prot:41.9,carb:46.0,fat:13.6,
+    tip:"Ohne Pulver: 300g Skyr + Banane + 15g Mandeln (388 kcal, 37g P) – genauso gut.",
+    ingredients:[
+      {name:"Whey Protein",amt:"40g"},
+      {name:"Milch 3,5%",amt:"300ml"},
+      {name:"Banane",amt:"120g"},
+    ],
+    steps:[
+      {t:"Whey mit Milch in Shaker oder Glas geben.",h:""},
+      {t:"20 Sek. schütteln oder mit Löffel gut verrühren.",h:""},
+      {t:"Banane dazu essen.",h:""},
+    ]
+  },
+  S2:{code:"S2",cat:"snack",
+    name:"Skyr Bowl mit Extras",time:"5 min",
+    kcal:521,prot:37.0,carb:61.9,fat:12.9,
+    tip:"Granola gibt Crunch. Schokolade 85% für bittere Note – passt perfekt zu Skyr.",
+    ingredients:[
+      {name:"Skyr",amt:"300g"},
+      {name:"Granola",amt:"30g"},
+      {name:"Apfel",amt:"150g"},
+      {name:"Schokolade 85%",amt:"15g"},
+      {name:"Honig",amt:"10g"},
+    ],
+    steps:[
+      {t:"Skyr in eine Schüssel geben.",h:""},
+      {t:"Apfel würfeln. Schokolade grob hacken.",h:""},
+      {t:"Granola, Apfel, Schokolade und Honig drüber.",h:""},
+    ]
+  },
+  S3:{code:"S3",cat:"snack",
+    name:"Reiswaffeln mit Erdnussbutter & Banane",time:"2 min",
+    kcal:337,prot:9.0,carb:52.0,fat:11.0,
+    tip:"Natürliche Erdnussbutter (nur Erdnüsse) bevorzugen – ohne Zuckerzusatz.",
+    ingredients:[
+      {name:"Reiswaffeln",amt:"3 Stück (37g)"},
+      {name:"Erdnussbutter (natürlich)",amt:"20g"},
+      {name:"Banane",amt:"80g"},
+    ],
+    steps:[
+      {t:"Reiswaffeln auf Teller legen.",h:""},
+      {t:"Erdnussbutter drauf streichen.",h:""},
+      {t:"Banane in Scheiben schneiden und drauf legen.",h:""},
+    ]
+  },
+  S4:{code:"S4",cat:"snack",
+    name:"Magerquark mit Früchten",time:"3 min",
+    kcal:329,prot:30.0,carb:46.0,fat:4.0,
+    tip:"TK-Beeren direkt aus der Tiefkühle = funktioniert genauso und ist günstiger.",
+    ingredients:[
+      {name:"Magerquark",amt:"200g"},
+      {name:"Haferflocken",amt:"35g"},
+      {name:"Erdbeeren / Beeren",amt:"100g"},
+      {name:"Honig",amt:"10g"},
+    ],
+    steps:[
+      {t:"Magerquark in Schüssel geben.",h:""},
+      {t:"Haferflocken und Honig unterrühren.",h:""},
+      {t:"Früchte / Beeren drauf.",h:""},
     ]
   },
 };
 
 const WEEK = [
-  { day: 'Mo', training: 'Lower', F: 'F1', M: 'M1', S: 'S1', A: 'A3', kcal: 3284 },
-  { day: 'Di', training: 'Push + Zone 2', F: 'F2', M: 'M2', S: 'S1', A: 'A2', kcal: 3065 },
-  { day: 'Mi', training: 'Pull', F: 'F4', M: 'M1', S: 'S1', A: 'A3', kcal: 3141 },
-  { day: 'Do', training: 'Lower', F: 'F1', M: 'M3', S: 'S1', A: 'A3', kcal: 3249 },
-  { day: 'Fr', training: 'Zone 2', F: 'F2', M: 'M2', S: 'S2', A: 'A1', kcal: 3001 },
-  { day: 'Sa', training: 'Upper', F: 'F1', M: 'M1', S: 'S1', A: 'A3', kcal: 3284 },
-  { day: 'So', training: 'Intervalle', F: 'F4', M: 'M3', S: 'S2', A: 'A2', kcal: 2898 },
+  {day:"Mo",training:"Lower",F:"F4",M:"M1",S:"S1",A:"A3",kcal:3141,prot:246,carb:430,fat:68},
+  {day:"Di",training:"Push + Zone 2",F:"F2",M:"M4",S:"S4",A:"A2",kcal:2844,prot:225,carb:226,fat:121},
+  {day:"Mi",training:"Pull",F:"F4",M:"M6",S:"S2",A:"A1",kcal:2930,prot:260,carb:378,fat:57},
+  {day:"Do",training:"Lower",F:"F5",M:"M3",S:"S1",A:"A5",kcal:3325,prot:241,carb:306,fat:121},
+  {day:"Fr",training:"Zone 2",F:"F4",M:"M2",S:"S3",A:"A3",kcal:3080,prot:212,carb:421,fat:73},
+  {day:"Sa",training:"Upper",F:"F6",M:"M7",S:"S1",A:"A1",kcal:3206,prot:218,carb:361,fat:74},
+  {day:"So",training:"Intervalle",F:"F1",M:"M5",S:"S2",A:"A2",kcal:3073,prot:202,carb:350,fat:92},
 ];
 
 const SHOPPING = [
-  {
-    cat: '🥩 Protein',
-    icon: '🥩',
-    items: [
-      { name: 'Hähnchenbrust', qty: '1,4 kg' },
-      { name: 'Rinderhack (~15% Fett)', qty: '800g' },
-      { name: 'Eier', qty: '25 Stück' },
-      { name: 'Skyr', qty: '1,8 kg' },
-      { name: 'Putenaufschnitt', qty: '150g' },
-      { name: 'Frischkäse (Philadelphia)', qty: '150g' },
-      { name: 'Mozzarella', qty: '320g' },
-      { name: 'Streukäse Gouda (gerieben)', qty: '160g' },
-      { name: 'Whey Protein', qty: '~200g (optional)' },
-    ]
-  },
-  {
-    cat: '🍚 Kohlenhydrate',
-    icon: '🍚',
-    items: [
-      { name: 'Haferflocken', qty: '400g' },
-      { name: 'Reis (roh)', qty: '700g' },
-      { name: 'Pasta (Penne/Rigatoni)', qty: '600g' },
-      { name: 'Kartoffeln', qty: '1,5 kg' },
-      { name: 'Süßkartoffeln', qty: '600g' },
-      { name: 'Tortilla Wraps', qty: '1 Packung (6 Stück)' },
-      { name: 'Vollkorntoast', qty: '1 Packung' },
-      { name: 'Bananen', qty: '10 Stück' },
-      { name: 'Äpfel', qty: '6 Stück' },
-      { name: 'Puffreis', qty: '1 Packung' },
-      { name: 'Granola', qty: '200g' },
-    ]
-  },
-  {
-    cat: '🫙 Fette & Extras',
-    icon: '🫙',
-    items: [
-      { name: 'Olivenöl', qty: '1 Flasche' },
-      { name: 'Mandeln', qty: '200g' },
-      { name: 'Milch 3,5%', qty: '2 Liter' },
-      { name: 'Passata', qty: '400g' },
-      { name: 'Creme fraîche', qty: '200g' },
-      { name: 'Schokolade 85%', qty: '1–2 Tafeln' },
-      { name: 'Honig', qty: '1 Glas' },
-    ]
-  },
-  {
-    cat: '🥦 Gemüse',
-    icon: '🥦',
-    items: [
-      { name: 'Brokkoli', qty: 'je nach Saison' },
-      { name: 'Paprika', qty: 'je nach Saison' },
-      { name: 'Zwiebeln', qty: 'je nach Saison' },
-      { name: 'Knoblauch', qty: 'je nach Saison' },
-    ]
-  },
+  {cat:"🥩 Fleisch & Eier",items:[
+    {name:"Hähnchenbrust",amt:"2 kg",done:false},
+    {name:"Rinderhack (~15% Fett)",amt:"850g",done:false},
+    {name:"Kalbsschnitzel",amt:"250g",done:false},
+    {name:"Putenaufschnitt",amt:"200g",done:false},
+    {name:"Eier",amt:"15 Stück",done:false},
+  ]},
+  {cat:"🥛 Milchprodukte",items:[
+    {name:"Skyr (Arla Natur)",amt:"2 kg",done:false},
+    {name:"Magerquark",amt:"500g",done:false},
+    {name:"Milch 3,5%",amt:"1,5 L",done:false},
+    {name:"Frischkäse (Philadelphia)",amt:"1 Pkg.",done:false},
+    {name:"Schmand",amt:"100g",done:false},
+    {name:"Creme fraîche",amt:"100g",done:false},
+    {name:"Mozzarella",amt:"2 Kugeln",done:false},
+    {name:"Parmesan (gerieben)",amt:"50g",done:false},
+    {name:"Feta",amt:"50g",done:false},
+    {name:"Gouda Streukäse",amt:"100g",done:false},
+  ]},
+  {cat:"🌾 Kohlenhydrate & Brot",items:[
+    {name:"Reis (Langkorn)",amt:"500g",done:false},
+    {name:"Pasta (Penne/Rigatoni)",amt:"500g",done:false},
+    {name:"Vollkorntoast",amt:"1 Pkg.",done:false},
+    {name:"Tortilla Wraps",amt:"1 Pkg.",done:false},
+    {name:"Bagels",amt:"4 Stück",done:false},
+    {name:"Pita-Brot",amt:"1 Pkg.",done:false},
+    {name:"Semmelbrösel",amt:"1 Pkg.",done:false},
+    {name:"Haferflocken",amt:"200g",done:false},
+    {name:"Puffreis",amt:"100g",done:false},
+    {name:"Granola",amt:"1 Pkg.",done:false},
+    {name:"Reiswaffeln",amt:"1 Pkg.",done:false},
+  ]},
+  {cat:"🥔 Gemüse & Kartoffeln",items:[
+    {name:"Kartoffeln",amt:"1,5 kg",done:false},
+    {name:"Süßkartoffeln",amt:"750g",done:false},
+    {name:"Brokkoli",amt:"500g",done:false},
+    {name:"Paprika (gemischt)",amt:"500g",done:false},
+    {name:"Zucchini",amt:"1 Stück",done:false},
+    {name:"Zwiebeln",amt:"4 Stück",done:false},
+    {name:"Knoblauch",amt:"1 Knolle",done:false},
+    {name:"Gurke",amt:"1 Stück",done:false},
+    {name:"Tomaten",amt:"2 Stück",done:false},
+  ]},
+  {cat:"🍌 Obst",items:[
+    {name:"Bananen",amt:"10 Stück",done:false},
+    {name:"Äpfel",amt:"1 kg (7 Stück)",done:false},
+    {name:"Erdbeeren / Beeren",amt:"150g (TK mögl.)",done:false},
+  ]},
+  {cat:"🛒 Sonstiges",items:[
+    {name:"Whey Protein",amt:"200g",done:false},
+    {name:"Mandeln",amt:"100g",done:false},
+    {name:"Schokolade 85%",amt:"2 Tafeln",done:false},
+    {name:"Honig",amt:"1 Glas",done:false},
+    {name:"Erdnussbutter (natürlich)",amt:"1 Glas",done:false},
+    {name:"Passata",amt:"1 Flasche (500g)",done:false},
+    {name:"Gyros-Gewürz",amt:"1 Pkg.",done:false},
+    {name:"Olivenöl",amt:"vorhanden",done:false},
+  ]},
 ];
 
 const SUPPLEMENTS = [
-  { name: 'Magnesium', sub: 'Schlaf & Regeneration', icon: '💊', bg: 'rgba(48,217,134,.1)', status: 'go', tag: '✓ Weiter nehmen', body: 'Wichtig für Schlaf, Nervenfunktion und Muskelregeneration. Täglich abends einnehmen.' },
-  { name: 'Omega-3', sub: 'Kein Fisch → Pflicht', icon: '🐟', bg: 'rgba(79,142,247,.1)', status: 'go', tag: '✓ Unbedingt weiter', body: 'Da du keinen Fisch isst, ist Omega-3 über Kapseln unverzichtbar. Deckt den Bedarf an EPA und DHA.' },
-  { name: 'Vitamin D3 + K2', sub: 'Essenziell im Studium', icon: '☀️', bg: 'rgba(255,159,58,.1)', status: 'go', tag: '✓ Weiter nehmen', body: 'Besonders in Deutschland und bei wenig Sonnenexposition im Alltag essenziell. D3 + K2 immer kombiniert.' },
-  { name: 'Kreatin HCl', sub: 'Statt Monohydrat testen', icon: '⚡', bg: 'rgba(191,90,242,.1)', status: 'maybe', tag: '→ HCl testen', body: 'Kreatin Monohydrat verursacht dir Kopfschmerzen durch Wassereinlagerung. Kreatin HCl ist besser löslich, 2–3g Dosis, deutlich weniger Nebenwirkungen. Täglich nach dem Training.' },
-  { name: 'Ashwagandha', sub: 'Momentan nicht nötig', icon: '🌿', bg: 'rgba(255,95,95,.1)', status: 'stop', tag: '× Absetzen ist fine', body: 'Evidenz für Cortisol & Schlaf ist da, aber kein direkter Muskelaufbau-Effekt. Wenn kein merklicher Unterschied — weglassen.' },
+  {name:"Kreatin Monohydrat",dose:"5g täglich",timing:"Morgens mit Wasser (auch Ruhetage)",note:"Günstigste Form: Pulver (MyProtein, Bulk). Kein Loading nötig – einfach täglich nehmen."},
+  {name:"Whey Protein",dose:"30–40g nach Training",timing:"Post-Workout oder als Snack-Ersatz",note:"Nur wenn tägliches Protein-Ziel nicht über echte Nahrung erreicht wird."},
+  {name:"Vitamin D3 + K2",dose:"2000–5000 IE D3 + 100 mcg K2",timing:"Morgens mit fetthaltiger Mahlzeit",note:"Besonders wichtig Oktober–März. Blutwert einmalig beim Arzt checken lassen."},
+  {name:"Magnesium Glycinat",dose:"300–400 mg",timing:"Abends (besserer Schlaf)",note:"Glycinat-Form ist am besten verträglich. Bei schlechtem Schlaf oder Muskelkrämpfen anfangen."},
+];
+
+const STORAGE = [
+  {food:"Hähnchenbrust (gegart)",time:"3–4 Tage",temp:"≤ 4°C"},
+  {food:"Rinderhack (gegart)",time:"3–4 Tage",temp:"≤ 4°C"},
+  {food:"Reis (gekocht)",time:"3–4 Tage",temp:"≤ 4°C"},
+  {food:"Kartoffeln (gekocht)",time:"3–4 Tage",temp:"≤ 4°C"},
+  {food:"Schnitzel (gebraten)",time:"2–3 Tage",temp:"≤ 4°C"},
+];
+
+const BATCH = [
+  {day:"Sonntag (für Mo–Mi)",tasks:[
+    "3–4× Hähnchenbrust braten (Mo: M1+A3, Mi: M6+A1)",
+    "300–400g Reis kochen (Mo: M1, Fr: M2)",
+    "Gemüse waschen und schneiden, im Kühlschrank lagern",
+    "Overnight Oats für Montag vorbereiten (F1)",
+  ]},
+  {day:"Mittwoch (für Do–Sa)",tasks:[
+    "2–3× Hähnchenbrust braten (Do: M3+A5, Sa: A1)",
+    "130g Reis kochen (Sa: M7)",
+    "Kartoffeln für Donnerstag (A5 Püree) vorbereiten",
+    "Rinderhack für Dienstag (A2) und Sonntag (A2) einfrieren",
+  ]},
 ];
 
 // ━━━ STATE ━━━
-let currentDay = new Date().getDay(); // 0=So, 1=Mo...
-// Adjust to our array (0=Mo...6=So)
-let todayIdx = currentDay === 0 ? 6 : currentDay - 1;
-let activeShop = {};
+let todayIdx = new Date().getDay();
+todayIdx = todayIdx === 0 ? 6 : todayIdx - 1;
+let selectedDay = todayIdx;
 
-// ━━━ INIT ━━━
-function init() {
-  setGreeting();
-  buildWeekStrip();
-  renderToday(todayIdx);
-  buildWeekOverview();
-  buildMealsPage();
-  buildShoppingPage();
-  buildExtrasPage();
+// ━━━ NAV ━━━
+function showPage(id, btn) {
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  window.scrollTo(0,0);
 }
 
-function setGreeting() {
-  const h = new Date().getHours();
-  const el = document.getElementById('headerGreeting');
-  if (h < 11) el.textContent = 'Guten Morgen,';
-  else if (h < 17) el.textContent = 'Hey,';
-  else el.textContent = 'Guten Abend,';
-}
-
-// ━━━ WEEK STRIP ━━━
+// ━━━ HEUTE ━━━
 function buildWeekStrip() {
-  const cont = document.getElementById('weekStrip');
-  cont.innerHTML = '';
-  WEEK.forEach((d, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'week-day-btn' + (i === todayIdx ? ' active' : '');
-    btn.innerHTML = `<span class="wd-name">${d.day}</span><span class="wd-kcal">${d.kcal.toLocaleString('de')} kcal</span>`;
-    btn.onclick = () => selectDay(i);
-    cont.appendChild(btn);
-  });
+  const strip = document.getElementById("weekStrip");
+  strip.innerHTML = WEEK.map((w,i) => `
+    <div class="week-dot ${i===selectedDay?"active":""}" onclick="selectDay(${i})">
+      <span class="week-dot-day">${w.day}</span>
+      <span class="week-dot-kcal">${(w.kcal/1000).toFixed(1)}k</span>
+    </div>
+  `).join("");
 }
 
-function selectDay(idx) {
-  todayIdx = idx;
-  document.querySelectorAll('.week-day-btn').forEach((b, i) => {
-    b.classList.toggle('active', i === idx);
-  });
-  renderToday(idx);
+function selectDay(i) {
+  selectedDay = i;
+  buildWeekStrip();
+  buildTodayContent();
+  updateHeader();
 }
 
-// ━━━ TODAY VIEW ━━━
-function renderToday(idx) {
-  const d = WEEK[idx];
-  const cont = document.getElementById('todayContent');
+function updateHeader() {
+  const d = WEEK[selectedDay];
+  document.getElementById("headerDayName").textContent = selectedDay===todayIdx ? "Heute" : d.day;
+  document.getElementById("stripKcal").textContent = d.kcal.toLocaleString("de");
+  document.getElementById("stripProt").textContent = d.prot+"g";
+  document.getElementById("stripCarb").textContent = d.carb+"g";
+  document.getElementById("stripFat").textContent = d.fat+"g";
+}
 
-  const catMap = {
-    F: { label: 'Frühstück', cls: 'fruehstueck', icon: '🌅' },
-    M: { label: 'Mittagessen', cls: 'mittagessen', icon: '🍚' },
-    S: { label: 'Snack', cls: 'snack', icon: '⚡' },
-    A: { label: 'Abendessen', cls: 'abendessen', icon: '🌙' },
-  };
+const CAT_LABEL = {F:"Frühstück",M:"Mittag",S:"Snack",A:"Abend"};
 
-  let rows = '';
-  for (const [key, cat] of Object.entries(catMap)) {
-    const meal = MEALS[d[key]];
-    rows += `
-      <div class="meal-row" onclick="openMeal('${meal.code}')">
-        <div class="meal-row-icon ${cat.cls}">${cat.icon}</div>
-        <div class="meal-row-text">
-          <div class="meal-row-cat">${cat.label}</div>
-          <div class="meal-row-name">${meal.name}</div>
-        </div>
-        <div class="meal-row-kcal">${meal.kcal} kcal</div>
-      </div>`;
-  }
+function imgTag(code, cls) {
+  const url = IMG_VERIFIED[code];
+  if (!url) return `<div class="${cls}" style="background:var(--bg3)"></div>`;
+  return `<img class="${cls}" src="${url}" alt="" loading="lazy" onerror="this.style.opacity=0">`;
+}
 
-  // Update header macros for this day
-  const dayMeals = [MEALS[d.F], MEALS[d.M], MEALS[d.S], MEALS[d.A]];
-  const totP = dayMeals.reduce((s, m) => s + m.prot, 0).toFixed(0);
-  const totC = dayMeals.reduce((s, m) => s + m.carb, 0).toFixed(0);
-  const totF = dayMeals.reduce((s, m) => s + m.fat, 0).toFixed(0);
-  document.getElementById('stripKcal').textContent = d.kcal.toLocaleString('de');
-  document.getElementById('stripProt').textContent = totP + 'g';
-  document.getElementById('stripCarb').textContent = totC + 'g';
-  document.getElementById('stripFat').textContent = totF + 'g';
-
-  cont.innerHTML = `
-    <div class="today-day">
-      <div class="today-day-header">
-        <div class="today-day-name">${d.day === WEEK[todayIdx].day && idx === (new Date().getDay() === 0 ? 6 : new Date().getDay() - 1) ? 'Heute · ' : ''}${['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'][idx]}</div>
-        <div class="today-training-badge">🏋️ ${d.training}</div>
+function buildTodayContent() {
+  const d = WEEK[selectedDay];
+  const rows = ["F","M","S","A"].map(slot => {
+    const m = MEALS[d[slot]];
+    if (!m) return "";
+    return `<div class="meal-row" onclick="openMeal('${m.code}')">
+      ${imgTag(m.code,"meal-row-thumb")}
+      <div class="meal-row-body">
+        <div class="meal-row-cat">${CAT_LABEL[slot]}</div>
+        <div class="meal-row-name">${m.name}</div>
+        <div class="meal-row-kcal">${m.kcal} kcal · P ${m.prot}g · KH ${m.carb}g · F ${m.fat}g</div>
+      </div>
+      <div class="meal-row-arrow">›</div>
+    </div>`;
+  }).join("");
+  document.getElementById("todayContent").innerHTML = `
+    <div class="today-card">
+      <div class="today-header">
+        <div class="today-day-name">${selectedDay===todayIdx?"Heute – ":""}${WEEK[selectedDay].day}</div>
+        <div class="training-badge">🏋️ ${WEEK[selectedDay].training}</div>
       </div>
       ${rows}
-      <div class="day-total-bar">
-        <span class="label">Tagesgesamt</span>
-        <span class="total-val">${d.kcal.toLocaleString('de')} kcal</span>
-      </div>
     </div>`;
 }
 
-// ━━━ WEEK OVERVIEW ━━━
+// ━━━ WOCHE ━━━
 function buildWeekOverview() {
-  const cont = document.getElementById('weekOverview');
-  const dayNames = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'];
-  const avg = Math.round(WEEK.reduce((s, d) => s + d.kcal, 0) / 7);
-  let html = `
-    <div class="today-day" style="margin-bottom:10px;">
-      <div class="today-day-header">
-        <div class="today-day-name">Wochenschnitt</div>
-        <div class="today-training-badge">${avg.toLocaleString('de')} kcal / Tag</div>
+  document.getElementById("weekOverview").innerHTML = WEEK.map((w,i) => {
+    const rows = ["F","M","S","A"].map(slot => {
+      const m = MEALS[w[slot]];
+      if (!m) return "";
+      return `<div class="week-ov-row" onclick="openMeal('${m.code}')">
+        ${imgTag(m.code,"week-ov-thumb")}
+        <div class="week-ov-body">
+          <span class="week-ov-cat">${CAT_LABEL[slot]}</span>
+          <span class="week-ov-name">${m.name}</span>
+          <span class="week-ov-kcal2">${m.kcal} kcal</span>
+        </div>
+      </div>`;
+    }).join("");
+    return `<div class="week-overview-card">
+      <div class="week-ov-header">
+        <span class="week-ov-day">${w.day} · ${w.training}</span>
+        <span class="week-ov-kcal">${w.kcal.toLocaleString("de")} kcal</span>
       </div>
-      <div style="padding: 14px 16px; display:flex; gap:16px; flex-wrap:wrap;">
-        <div style="flex:1; min-width:120px;">
-          <div style="font-size:11px; color:var(--text3); font-weight:700; text-transform:uppercase; margin-bottom:4px;">Ziel</div>
-          <div style="font-size:20px; font-weight:800; color:var(--accent);">3.250 kcal</div>
-        </div>
-        <div style="flex:1; min-width:120px;">
-          <div style="font-size:11px; color:var(--text3); font-weight:700; text-transform:uppercase; margin-bottom:4px;">Lücke</div>
-          <div style="font-size:20px; font-weight:800; color:var(--orange);">~118 kcal/Tag</div>
-        </div>
-        <div style="flex:1; min-width:200px; padding-top:4px;">
-          <div style="font-size:12px; color:var(--text2); line-height:1.5;">Einfach zu schließen: +20g Mandeln bei F4 oder 20g mehr Reis bei M1 reichen.</div>
-        </div>
-      </div>
+      ${rows}
     </div>`;
-
-  WEEK.forEach((d, i) => {
-    const dayMeals = [MEALS[d.F], MEALS[d.M], MEALS[d.S], MEALS[d.A]];
-    const labels = ['Frühstück','Mittag','Snack','Abend'];
-    const icons = ['🌅','🍚','⚡','🌙'];
-    const keys = ['F','M','S','A'];
-    let rows = '';
-    keys.forEach((k, ki) => {
-      const m = MEALS[d[k]];
-      rows += `<div class="meal-row" onclick="openMeal('${m.code}')">
-        <div class="meal-row-icon" style="background:var(--bg2); font-size:16px;">${icons[ki]}</div>
-        <div class="meal-row-text">
-          <div class="meal-row-cat">${labels[ki]}</div>
-          <div class="meal-row-name">${m.name}</div>
-        </div>
-        <div class="meal-row-kcal">${m.kcal}</div>
-      </div>`;
-    });
-
-    html += `
-      <div class="today-day" style="margin-bottom:8px;">
-        <div class="today-day-header">
-          <div class="today-day-name">${dayNames[i]}</div>
-          <div class="today-training-badge">🏋️ ${d.training}</div>
-        </div>
-        ${rows}
-        <div class="day-total-bar">
-          <span class="label">Tagesgesamt</span>
-          <span class="total-val">${d.kcal.toLocaleString('de')} kcal</span>
-        </div>
-      </div>`;
-  });
-
-  cont.innerHTML = html;
+  }).join("");
 }
 
-// ━━━ MAHLZEITEN PAGE ━━━
+// ━━━ MAHLZEITEN ━━━
 function buildMealsPage() {
-  const cont = document.getElementById('mealsContainer');
-  let html = '';
-  Object.values(MEALS).forEach(m => {
-    const ings = m.ingredients.map(i =>
-      `<div class="ing-row"><span class="ing-name">${i.name}</span><span class="ing-detail">${i.amt} · ${i.kcal} kcal</span></div>`
-    ).join('');
-    html += `
-      <div class="meal-card visible" data-cat="${m.cat}" id="card-${m.code}">
-        <div class="meal-card-head">
-          <div class="meal-card-code">${m.code} · ${m.cat === 'fruehstueck' ? 'Frühstück' : m.cat === 'mittagessen' ? 'Mittagessen' : m.cat === 'snack' ? 'Snack' : 'Abendessen'}</div>
-          <div class="meal-card-title">${m.name}</div>
-          <div class="meal-card-time">⏱ ${m.time}</div>
+  const catLabel = {fruehstueck:"Frühstück",hauptgericht:"Hauptgericht",snack:"Snack"};
+  document.getElementById("mealsContainer").innerHTML = Object.values(MEALS).map(m => `
+    <div class="meal-card" data-cat="${m.cat}" data-flex="${m.flexible||false}" onclick="openMeal('${m.code}')">
+      <div class="meal-card-top">
+        ${imgTag(m.code,"meal-card-img")}
+        <div class="meal-card-body">
+          <div class="meal-card-cat">${catLabel[m.cat]||m.cat}</div>
+          <div class="meal-card-name">${m.name}</div>
+          <div class="meal-card-time">${m.time}</div>
         </div>
-        <div class="macros-row">
-          <div class="macro-cell"><span class="macro-cell-val kcal">${m.kcal}</span><span class="macro-cell-label">kcal</span></div>
-          <div class="macro-cell"><span class="macro-cell-val prot">${m.prot}g</span><span class="macro-cell-label">Protein</span></div>
-          <div class="macro-cell"><span class="macro-cell-val carb">${m.carb}g</span><span class="macro-cell-label">Carbs</span></div>
-          <div class="macro-cell"><span class="macro-cell-val fat">${m.fat}g</span><span class="macro-cell-label">Fett</span></div>
-        </div>
-        <div class="ingredients-list">${ings}</div>
-        ${m.tip ? `<div class="meal-tip">💡 ${m.tip}</div>` : ''}
-      </div>`;
-  });
-  cont.innerHTML = html;
+      </div>
+      <div class="meal-card-macros">
+        <div class="meal-macro"><span class="meal-macro-val">${m.kcal}</span><span class="meal-macro-label">kcal</span></div>
+        <div class="meal-macro"><span class="meal-macro-val">${m.prot}g</span><span class="meal-macro-label">Protein</span></div>
+        <div class="meal-macro"><span class="meal-macro-val">${m.carb}g</span><span class="meal-macro-label">Carbs</span></div>
+        <div class="meal-macro"><span class="meal-macro-val">${m.fat}g</span><span class="meal-macro-label">Fett</span></div>
+      </div>
+    </div>
+  `).join("");
 }
 
-function filterMeals(cat, btn) {
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('.meal-card').forEach(card => {
-    if (cat === 'all' || card.dataset.cat === cat) {
-      card.classList.add('visible');
-    } else {
-      card.classList.remove('visible');
+function filterMeals(filter, btn) {
+  document.querySelectorAll(".meal-card").forEach(card => {
+    const cat = card.dataset.cat;
+    const flex = card.dataset.flex === "true";
+    let show = filter === "all";
+    if (!show) {
+      if (filter === "hauptgericht") show = cat === "hauptgericht" || flex;
+      else show = cat === filter;
     }
+    card.style.display = show ? "block" : "none";
   });
+  document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
 }
 
-// ━━━ SHOPPING PAGE ━━━
-let shopState = {};
-
-function buildShoppingPage() {
-  const cont = document.getElementById('shopContainer');
-  let html = '';
-  let totalItems = 0;
-  SHOPPING.forEach((section, si) => {
-    let items = '';
-    section.items.forEach((item, ii) => {
-      const key = `${si}-${ii}`;
-      totalItems++;
-      items += `
-        <div class="shop-item" id="shopItem-${key}" onclick="toggleShop('${key}', ${si}, ${ii})">
-          <div class="shop-cb" id="shopCb-${key}"></div>
-          <span class="shop-name">${item.name}</span>
-          <span class="shop-qty">${item.qty}</span>
-        </div>`;
-    });
-    html += `
-      <div class="shop-section" style="margin-bottom:10px;">
-        <div class="shop-section-header">${section.cat}</div>
-        ${items}
-      </div>`;
-  });
-  cont.innerHTML = html;
-  window._shopTotal = totalItems;
-  updateShopProgress();
+// ━━━ EINKAUF ━━━
+const shopState = {};
+function buildShopPage() {
+  SHOPPING.forEach(cat => cat.items.forEach((_,i) => shopState[cat.cat+i] = false));
+  renderShop();
 }
-
-function toggleShop(key, si, ii) {
+function toggleShop(key) {
   shopState[key] = !shopState[key];
-  const item = document.getElementById('shopItem-' + key);
-  const cb = document.getElementById('shopCb-' + key);
-  if (shopState[key]) {
-    item.classList.add('done');
-    cb.classList.add('checked');
-  } else {
-    item.classList.remove('done');
-    cb.classList.remove('checked');
-  }
-  updateShopProgress();
+  renderShop();
 }
-
-function updateShopProgress() {
-  const checked = Object.values(shopState).filter(Boolean).length;
-  const total = window._shopTotal || 31;
-  const pct = Math.round((checked / total) * 100);
-  document.getElementById('shopProgress').style.width = pct + '%';
-  document.getElementById('shopProgressText').textContent = `${checked} / ${total}`;
-}
-
-// ━━━ EXTRAS PAGE ━━━
-function buildExtrasPage() {
-  const cont = document.getElementById('supplementsContainer');
-  let html = '';
-  SUPPLEMENTS.forEach(s => {
-    const tagClass = s.status === 'go' ? 'go' : s.status === 'stop' ? 'stop' : 'maybe';
-    html += `
-      <div class="extra-card">
-        <div class="extra-header">
-          <div class="extra-icon" style="background:${s.bg}">${s.icon}</div>
-          <div><div class="extra-name">${s.name}</div><div class="extra-sub">${s.sub}</div></div>
+function renderShop() {
+  const total = Object.keys(shopState).length;
+  const done = Object.values(shopState).filter(Boolean).length;
+  document.getElementById("shopProgressText").textContent = done+" / "+total+" erledigt";
+  document.getElementById("shopProgress").style.width = (total?done/total*100:0)+"%";
+  document.getElementById("shopContainer").innerHTML = SHOPPING.map(cat => {
+    const items = cat.items.map((item,i) => {
+      const key = cat.cat+i;
+      const d = shopState[key];
+      return `<div class="shop-item ${d?"done":""}" onclick="toggleShop('${key}')">
+        <div class="shop-item-check">${d?"✓":""}</div>
+        <div class="shop-item-text">
+          <div class="shop-item-name">${item.name}</div>
+          <div class="shop-item-amt">${item.amt}</div>
         </div>
-        <div class="extra-body">${s.body}</div>
-        <span class="extra-tag ${tagClass}">${s.tag}</span>
       </div>`;
-  });
-  cont.innerHTML = html;
-
-  const batch = document.getElementById('batchContainer');
-  batch.innerHTML = `
-    <div class="batch-card">
-      <div class="batch-title">🍳 1× pro Woche (~40 min) <span style="font-size:12px;font-weight:500;color:var(--text2);">z.B. Sonntag</span></div>
-      <div class="batch-step">
-        <div class="batch-num">1</div>
-        <div class="batch-text"><strong>600g Hähnchenbrust</strong> auf einmal braten → reicht für Mo, Mi, Sa Mittag (M1)</div>
-      </div>
-      <div class="batch-step">
-        <div class="batch-num">2</div>
-        <div class="batch-text"><strong>400g Reis</strong> auf einmal kochen → 3–4 Tage haltbar im Kühlschrank</div>
-      </div>
-      <div class="batch-step">
-        <div class="batch-num">3</div>
-        <div class="batch-text"><strong>Overnight Oats</strong> abends in 5 min vorbereiten — morgens fertig</div>
-      </div>
-      <div class="batch-step">
-        <div class="batch-num">4</div>
-        <div class="batch-text"><strong>Rinderhack-Tipp:</strong> Doppelte Menge kochen (360g Hack, 260g Reis) → Di + Fr Mittag fertig</div>
-      </div>
-    </div>`;
+    }).join("");
+    return `<div class="shop-cat-header">${cat.cat}</div>${items}`;
+  }).join("");
 }
 
-// ━━━ MEAL MODAL ━━━
+// ━━━ EXTRAS ━━━
+function buildExtras() {
+  document.getElementById("supplementsContainer").innerHTML = SUPPLEMENTS.map(s => `
+    <div class="supp-card">
+      <div class="supp-name">${s.name}</div>
+      <div class="supp-dose">💊 ${s.dose}</div>
+      <div class="supp-timing">⏰ ${s.timing}</div>
+      <div class="supp-note">${s.note}</div>
+    </div>
+  `).join("");
+  document.getElementById("storageContainer").innerHTML = `
+    <div class="storage-table">
+      ${STORAGE.map(s=>`<div class="storage-row">
+        <div class="storage-food">${s.food}</div>
+        <div><div class="storage-time">${s.time}</div><div class="storage-temp">${s.temp}</div></div>
+      </div>`).join("")}
+    </div>
+    <div class="hint-box" style="margin-top:0">⚠️ Reis schnell abkühlen – nicht warm stehen lassen.</div>
+  `;
+  document.getElementById("batchContainer").innerHTML = BATCH.map(b => `
+    <div class="batch-card">
+      <div class="batch-day">📅 ${b.day}</div>
+      ${b.tasks.map(t=>`<div class="batch-task">${t}</div>`).join("")}
+    </div>
+  `).join("");
+}
+
+// ━━━ MODAL ━━━
 function openMeal(code) {
   const m = MEALS[code];
   if (!m) return;
-  const ings = m.ingredients.map(i =>
-    `<div class="ing-row"><span class="ing-name">${i.name}</span><span class="ing-detail">${i.amt} · ${i.kcal} kcal</span></div>`
-  ).join('');
-  document.getElementById('modalContent').innerHTML = `
-    <div class="modal-tag">${m.cat === 'fruehstueck' ? '🌅 Frühstück' : m.cat === 'mittagessen' ? '🍚 Mittagessen' : m.cat === 'snack' ? '⚡ Snack' : '🌙 Abendessen'} · ${m.code}</div>
+  const hero = document.getElementById("modalHero");
+  const img = document.getElementById("modalHeroImg");
+  const url = IMG_VERIFIED[code];
+  if (url) {
+    hero.style.display = "block";
+    img.src = url;
+  } else {
+    hero.style.display = "none";
+  }
+  const catLabel = m.cat==="fruehstueck"?"Frühstück":m.cat==="hauptgericht"?"Hauptgericht":"Snack";
+  const ingHtml = m.ingredients.map(i=>`
+    <div class="ingredient-row">
+      <span class="ingredient-name">${i.name}</span>
+      <span class="ingredient-amt">${i.amt}</span>
+    </div>`).join("");
+  let stepsHtml = "";
+  if (m.steps && m.steps.length) {
+    stepsHtml = `<div class="modal-section-title">Zubereitung</div>`+
+      m.steps.map((s,i)=>`<div class="step-row">
+        <div class="step-num">${i+1}</div>
+        <div><div class="step-text">${s.t}</div>${s.h?`<div class="step-hint">💡 ${s.h}</div>`:""}</div>
+      </div>`).join("");
+  }
+  document.getElementById("modalContent").innerHTML = `
+    <div class="modal-cat">${catLabel}</div>
     <div class="modal-title">${m.name}</div>
-    <div class="modal-subtitle">⏱ ${m.time}</div>
-    <div class="macros-row" style="border-radius:12px; overflow:hidden; margin-bottom:16px;">
-      <div class="macro-cell"><span class="macro-cell-val kcal">${m.kcal}</span><span class="macro-cell-label">kcal</span></div>
-      <div class="macro-cell"><span class="macro-cell-val prot">${m.prot}g</span><span class="macro-cell-label">Protein</span></div>
-      <div class="macro-cell"><span class="macro-cell-val carb">${m.carb}g</span><span class="macro-cell-label">Carbs</span></div>
-      <div class="macro-cell"><span class="macro-cell-val fat">${m.fat}g</span><span class="macro-cell-label">Fett</span></div>
+    <div class="modal-time">⏱ ${m.time}</div>
+    <div class="modal-macros">
+      <div class="modal-macro-box"><span class="modal-macro-val">${m.kcal}</span><span class="modal-macro-label">kcal</span></div>
+      <div class="modal-macro-box"><span class="modal-macro-val">${m.prot}g</span><span class="modal-macro-label">Protein</span></div>
+      <div class="modal-macro-box"><span class="modal-macro-val">${m.carb}g</span><span class="modal-macro-label">Carbs</span></div>
+      <div class="modal-macro-box"><span class="modal-macro-val">${m.fat}g</span><span class="modal-macro-label">Fett</span></div>
     </div>
-    <div style="font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;">Zutaten</div>
-    <div class="ingredients-list" style="background:var(--bg3);border-radius:12px;overflow:hidden;margin-bottom:14px;">${ings}</div>
-    ${m.tip ? `<div class="meal-tip">💡 ${m.tip}</div>` : ''}`;
-  document.getElementById('mealModal').classList.add('open');
-  document.getElementById('mealModal').querySelector('.modal-sheet').scrollTop = 0;
+    <div class="modal-section-title">Zutaten</div>
+    ${ingHtml}
+    ${stepsHtml}
+    ${m.tip?`<div class="tip-box"><b>Tipp:</b> ${m.tip}</div>`:""}
+  `;
+  document.getElementById("modalSheet").scrollTop = 0;
+  document.getElementById("mealModal").classList.add("open");
+  document.body.style.overflow = "hidden";
 }
 
 function closeModal(e) {
-  if (e.target === document.getElementById('mealModal')) {
-    document.getElementById('mealModal').classList.remove('open');
+  // Called either with no args (X button) or with click event (backdrop tap)
+  if (!e || e.target === document.getElementById("mealModal")) {
+    document.getElementById("mealModal").classList.remove("open");
+    document.body.style.overflow = "";
   }
 }
 
-// ━━━ NAVIGATION ━━━
-function showPage(pageId, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(pageId).classList.add('active');
-  btn.classList.add('active');
-}
-
-// ━━━ START ━━━
-init();
+// ━━━ INIT ━━━
+buildWeekStrip();
+buildTodayContent();
+updateHeader();
+buildWeekOverview();
+buildMealsPage();
+buildShopPage();
+buildExtras();
 </script>
 </body>
 </html>
